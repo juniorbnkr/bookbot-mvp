@@ -27,7 +27,7 @@ def hello_world():
 @app.route("/webhook/", methods=["POST", "GET"])
 def webhook_whatsapp():
     """__summary__: Get message from the webhook"""
-
+    print(request.method)
     if request.method == "GET":
         if request.args.get('hub.verify_token') == VERIFY_TOKEN:
             return request.args.get('hub.challenge')
