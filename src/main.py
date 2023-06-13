@@ -35,8 +35,9 @@ def webhook_whatsapp():
             return request.args.get('hub.challenge')
         return "Authentication failed. Invalid Token."
 
-    response = process_webhook_notification(request.get_json())
-    print(response)
+    print (request.get_json())
+    # response = process_webhook_notification(request.get_json())
+    # print(response) 
     # Do anything with the response
     # Sending a message to a phone number to confirm the webhook is working
 
