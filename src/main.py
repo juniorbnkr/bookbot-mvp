@@ -23,8 +23,8 @@ def webhook_whatsapp():
         for change in entry["changes"]:
             data['type'] = change["field"]
             data['number'] = change["value"]["metadata"]["display_phone_number"]
-            data['name'] = change["value"]['contacts']['profile']['name']
-            data['msg'] = change["value"]['messages']['text']['body']
+            data['name'] = change["value"]['contacts'][0]['profile']['name']
+            data['msg'] = change["value"]['messages'][0]['text']['body']
 
     if data['msg'] not in ['1','2']:
         print(f'''Olá{data['name']}, seja bem vindo ao bookBot \n
