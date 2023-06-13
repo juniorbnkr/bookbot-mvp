@@ -7,11 +7,9 @@ def process_webhook_notification(self, data):
         """_summary_: Process webhook notification
         For the moment, this will return the type of notification
         """
-
         response = []
 
         for entry in data["entry"]:
-
             for change in entry["changes"]:
                 response.append(
                     {
@@ -36,6 +34,7 @@ def webhook_whatsapp():
         return "Authentication failed. Invalid Token."
 
     print (request.get_json())
+    print (request)
     # response = process_webhook_notification(request.get_json())
     # print(response) 
     # Do anything with the response
