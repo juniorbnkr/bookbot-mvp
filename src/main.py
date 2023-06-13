@@ -1,6 +1,7 @@
 from flask import Flask, jsonify, request
 
 app = Flask(__name__)
+app.url_map.strict_slashes = False
 VERIFY_TOKEN = 'mvp-bot'
 
 def process_webhook_notification(self, data):
