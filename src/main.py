@@ -44,13 +44,13 @@ def webhook_whatsapp():
         msg_response = f"Olá {data['name']}, seja bem vindo ao bookBot \n digite 1 para teste 1, digite 2 para teste 2 "
         
     if data['msg'] == '1':
-        msg_response = " teste 1"
+        msg_response = " teste 1 \n |o|"
 
     if data['msg'] == '2':
-        msg_response = "teste 2"
+        msg_response = "teste 2 =D "
     # Do anything with the response
     print(msg_response)
-    send_msg("Esse é o teste 2:)",str(5511984149378))
+    send_msg(msg_response,str( data['number']))
 
     return jsonify({"status": "success"}, 200)
 
