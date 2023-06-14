@@ -23,6 +23,7 @@ def send_msg(msg,number):
     'Authorization': 'Bearer '+perm_token
     
     }
+    print(payload)
 
     response = requests.request("POST", url, headers=headers, data=payload)
 
@@ -50,7 +51,7 @@ def webhook_whatsapp():
             data['number'] = change["value"]["metadata"]["display_phone_number"]
             data['name'] = change["value"]['contacts'][0]['profile']['name']
             data['msg'] = change["value"]['messages'][0]['text']['body']
-
+    
     if data['msg'] not in ['1','2']:
         msg_response = f"Olá {data['name']}, seja bem vindo ao bookBot \n digite 1 para teste 1, digite 2 para teste 2 :)"
         
