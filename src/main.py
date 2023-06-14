@@ -36,12 +36,12 @@ def webhook_whatsapp():
     for entry in response["entry"]:
         for change in entry["changes"]:
             data['type'] = change["field"]
-            data['number'] = change["value"]["metadata"]["display_phone_number"]
+            data['number'] = change["value"]["contacts"]["wa_id"]
             data['name'] = change["value"]['contacts'][0]['profile']['name']
             data['msg'] = change["value"]['messages'][0]['text']['body']
     
     if data['msg'] not in ['1','2']:
-        msg_response = f"Olá {data['name']}, seja bem vindo ao bookBot \\n digite 1 para teste 1, digite 2 para teste 2 "
+        msg_response = f"Olá {data['name']}, seja bem vindo ao bookBot \n digite 1 para teste 1, digite 2 para teste 2 "
         
     if data['msg'] == '1':
         msg_response = " teste 1  |o|"
@@ -50,7 +50,7 @@ def webhook_whatsapp():
         msg_response = "teste 2 =D "
     # Do anything with the response
     print(msg_response)
-    send_msg(data['msg'],str( data['number']))
+    send_msg(msg_response,str( data['number']))
 
     return jsonify({"status": "success"}, 200)
 
