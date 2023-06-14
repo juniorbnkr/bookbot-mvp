@@ -1,9 +1,10 @@
 from flask import Flask, jsonify, request
-import json,requests
+import json,requests,os
 
 app = Flask(__name__)
 app.url_map.strict_slashes = False
 VERIFY_TOKEN = 'mvp-bot'
+perm_token = os.getenv('perm_token')
 
 def send_msg(msg,number):
     url = f"https://graph.facebook.com/v17.0/{number}/messages/"
@@ -16,7 +17,7 @@ def send_msg(msg,number):
     })
     headers = {
     'Content-Type': 'application/json',
-    'Authorization': 'Bearer EAAJoLQ0uknEBAFtn1bcXZAGR3cN4lEy3L1c2rbT3AmuPBn9W14SB4Bzvwun0ZBWto4kr9GobZA5MRLgZClzIWAUBa8uAKy4J3KzzAAetkZA8N8oCBZCJP2siV8SGFQS6BLr3v9yi2hogZB5TofmA9bmMZCeZAdL32IRPdH7gshGE7AAK4TQ3AvOhDnqTue3b6DCoIL1nLdtXPXwZDZD'
+    'Authorization': 'Bearer '+perm_token
     }
 
     response = requests.request("POST", url, headers=headers, data=payload)
