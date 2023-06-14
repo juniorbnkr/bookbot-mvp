@@ -76,7 +76,7 @@ digite 1 para teste 1, digite 2 para teste 2 :)'''
  /    _.'         
 ( _.-'            
 '''
-                 
+    msg_response = msg_response.replace('\n ','\n\n')
     # Do anything with the response
     send_msg(msg_response,data['number'])
 
