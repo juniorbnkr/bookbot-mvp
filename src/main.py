@@ -30,9 +30,9 @@ def webhook_whatsapp():
             return request.args.get('hub.challenge')
         return "Authentication failed. Invalid Token."
 
-
     response = request.get_json()
     data = {}
+    print(response["entry"])
     for entry in response["entry"]:
         for change in entry["changes"]:
             data['type'] = change["field"]
