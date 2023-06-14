@@ -7,13 +7,14 @@ VERIFY_TOKEN = 'mvp-bot'
 perm_token = os.getenv('perm_token')
 
 def send_msg(msg,number):
-    url = f"https://graph.facebook.com/v17.0/{number}/messages/"
+    url = f"https://graph.facebook.com/v17.0/116826464720753/messages/"
 
     payload = json.dumps({
     "messaging_product": "whatsapp",
     "to": number,
     "type": "text",
-    "text":msg
+    "text": {"preview_url": 'false',
+        "body": msg} 
     })
     headers = {
     'Content-Type': 'application/json',
