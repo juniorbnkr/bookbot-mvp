@@ -8,6 +8,7 @@ perm_token = os.getenv('perm_token')
 
 def send_msg(msg,number):
     url = "https://graph.facebook.com/v17.0/116826464720753/messages/"
+    print(perm_token)
 
     payload = json.dumps({
     "messaging_product": "whatsapp",
