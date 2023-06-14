@@ -7,29 +7,16 @@ VERIFY_TOKEN = 'mvp-bot'
 perm_token = os.getenv('perm_token')
 
 def send_msg(msg,number):
-    url = "https://graph.facebook.com/v17.0/116826464720753/messages/"
-    print(perm_token)
-
-    payload = json.dumps({
-    "messaging_product": "whatsapp",
-    "to": number,
-    "type": "text",
-    "text": {
-        "preview_url": False,
-        "body": msg} 
+   url = "http://104.198.41.165:5000/webhook"
+   payload = json.dumps({
+        "msg": msg,
+        "to": str(number)
     })
-    headers = {
-    'Content-Type': 'application/json',
-    'Authorization': 'Bearer '+perm_token
-    
+   headers = {
+    'Content-Type': 'application/json'
     }
-    print(payload)
-
-    # response = requests.request("POST", url, headers=headers, data=payload)
-    response = httpx.post(url, data=payload, headers=headers)
-
-    print(response.text)
-    return None
+   response = requests.request("POST", url, headers=headers, data=payload)
+   return response.text
 
 @app.route('/')
 def hello_world():
@@ -54,7 +41,7 @@ def webhook_whatsapp():
             data['msg'] = change["value"]['messages'][0]['text']['body']
     
     if data['msg'] not in ['1','2']:
-        msg_response = f"Ola {data['name']}, seja bem vindo ao bookBot \n digite 1 para teste 1, digite 2 para teste 2 "
+        msg_response = f"Olá {data['name']}, seja bem vindo ao bookBot \n digite 1 para teste 1, digite 2 para teste 2 "
         
     if data['msg'] == '1':
         msg_response = " teste 1"
@@ -63,7 +50,7 @@ def webhook_whatsapp():
         msg_response = "teste 2"
     # Do anything with the response
     print(msg_response)
-    send_msg(msg_response,str(data['number']))
+    send_msg("Esse é o teste 2:)",str(5511984149378))
 
     return jsonify({"status": "success"}, 200)
 
