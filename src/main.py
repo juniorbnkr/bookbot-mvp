@@ -25,7 +25,7 @@ def send_msg(msg,number):
     }
     print(payload)
 
-    # response = requests.request("POST", url, headers=headers: data=payload)
+    # response = requests.request("POST", url, headers=headers, data=payload)
     response = httpx.post(url, data=payload, headers=headers)
 
     print(response.text)
