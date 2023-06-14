@@ -59,13 +59,3 @@ def webhook_whatsapp():
 
 if __name__ == '__main__': 
     app.run(debug=True)
-
-    [{'id': '118314817903665', 'changes':
-       [{'value': {'messaging_product': 'whatsapp', 'metadata':
-                    {'display_phone_number': '5511997274105', 'phone_number_id': '116826464720753'}, 
-                    'statuses': 
-                    [{'id': 'wamid.HBgNNTUxMTk3MDk3NTUyORUCABEYEkIyRjA4NDlGRkVDRkIyQjNFMAA=',
-                       'status': 'delivered', 'timestamp': '1686760037', 'recipient_id': '5511970975529', 'conversation':
-                         {'id': '336b569ea96fe1f647e038fde911997b', 'origin': {'type': 'service'}}, 'pricing':
-                           {'billable': True, 'pricing_model': 'CBP', 'category': 'service'}}]}, 
-                                            'field': 'messages'}]}]
