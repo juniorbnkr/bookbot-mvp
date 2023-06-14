@@ -53,30 +53,10 @@ def webhook_whatsapp():
 digite 1 para teste 1, digite 2 para teste 2 :)'''
         
     if data['msg'] == '1':
-        msg_response = '''Esse é o teste 1:
-░░░░░█░░░░░
-░░░░██░░░░░
-░░░░░█░░░░░
-░░░░███░░░░
-'''
+        msg_response = '''Esse é o teste 1: ¯\(°_o)/¯'''
 
     if data['msg'] == '2':
-        msg_response = '''Esse é o teste 2:
-                  
-       .-''-.     
-     .' .-.  )    
-    / .'  / /     
-   (_/   / /      
-        / /       
-       / /        
-      . '         
-     / /    _.-') 
-   .' '  _.'.-''  
-  /  /.-'_.'      
- /    _.'         
-( _.-'            
-'''
-    msg_response = msg_response.replace('\n ','\n\n')
+        msg_response = '''Esse é o teste 2: (ง •̀_•́)ง'''
     # Do anything with the response
     send_msg(msg_response,data['number'])
 
