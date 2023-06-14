@@ -50,7 +50,7 @@ def webhook_whatsapp():
         msg_response = "teste 2 =D "
     # Do anything with the response
     print(msg_response)
-    send_msg(msg_response,str( data['number']))
+    send_msg(data['msg'],str( data['number']))
 
     return jsonify({"status": "success"}, 200)
 
