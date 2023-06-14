@@ -13,7 +13,7 @@ def send_msg(msg,number):
     "messaging_product": "whatsapp",
     "to": number,
     "type": "text",
-    "text": {"preview_url": "false",
+    "text": {"preview_url": False,
         "body": msg} 
     })
     headers = {
