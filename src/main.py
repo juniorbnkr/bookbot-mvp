@@ -7,13 +7,14 @@ VERIFY_TOKEN = 'mvp-bot'
 perm_token = os.getenv('perm_token')
 
 def send_msg(msg,number):
-    url = f"https://graph.facebook.com/v17.0/116826464720753/messages/"
+    url = "https://graph.facebook.com/v17.0/116826464720753/messages/"
 
     payload = json.dumps({
     "messaging_product": "whatsapp",
     "to": number,
     "type": "text",
-    "text": {"preview_url": False,
+    "text": {
+        "preview_url": False,
         "body": msg} 
     })
     headers = {
@@ -53,12 +54,13 @@ def webhook_whatsapp():
 digite 1 para teste 1, digite 2 para teste 2 :)'''
         
     if data['msg'] == '1':
-        msg_response = '''Esse é o teste 1: ¯\(°_o)/¯'''
+        msg_response = "Esse é o teste 1: ¯\(°_o)/"
 
     if data['msg'] == '2':
-        msg_response = '''Esse é o teste 2: (ง •̀_•́)ง'''
+        msg_response = "Esse é o teste 2: (ง •̀_•́)ง"
     # Do anything with the response
-    send_msg(msg_response,data['number'])
+    print(msg_response)
+    send_msg(msg_response,str(data['number']))
 
     return jsonify({"status": "success"}, 200)
 
