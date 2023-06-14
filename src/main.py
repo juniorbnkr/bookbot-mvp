@@ -20,6 +20,7 @@ def send_msg(msg,number):
     headers = {
     'Content-Type': 'application/json',
     'Authorization': 'Bearer '+perm_token
+    
     }
 
     response = requests.request("POST", url, headers=headers, data=payload)
@@ -50,8 +51,7 @@ def webhook_whatsapp():
             data['msg'] = change["value"]['messages'][0]['text']['body']
 
     if data['msg'] not in ['1','2']:
-        msg_response = f'''Olá {data['name']}, seja bem vindo ao bookBot
-digite 1 para teste 1, digite 2 para teste 2 :)'''
+        msg_response = f"Olá {data['name']}, seja bem vindo ao bookBot \n digite 1 para teste 1, digite 2 para teste 2 :)"
         
     if data['msg'] == '1':
         msg_response = "Esse é o teste 1: ¯\(°_o)/"
