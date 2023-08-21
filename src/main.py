@@ -7,16 +7,27 @@ VERIFY_TOKEN = 'mvp-bot'
 perm_token = os.getenv('perm_token')
 
 def send_msg(msg,number):
-   url = "http://104.198.41.165:5000/webhook"
-   payload = json.dumps({
-        "msg": msg,
-        "to": str(number)
+    url = "https://graph.facebook.com/v17.0/116826464720753/messages/"
+    print(perm_token)
+
+    payload = json.dumps({
+    "messaging_product": "whatsapp",
+    "to": number,
+    "type": "text",
+    "text": {
+        "preview_url": False,
+        "body": msg} 
     })
-   headers = {
-    'Content-Type': 'application/json'
+    headers = {
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer '+perm_token
+
     }
-   response = requests.request("POST", url, headers=headers, data=payload)
-   return response.text
+    print(payload)
+    response = requests.request("POST", url, headers=headers, data=payload)
+    # response = httpx.post(url, data=payload, headers=headers)
+    # print(response.text)
+    return response
 
 @app.route('/')
 def hello_world():
