@@ -106,7 +106,7 @@ def next_msg(number,name,input_msg):
    
     msgs = pd.read_sql(text(f"SELECT * FROM bot_mvp.msg_log ml \
                      WHERE phone_number = {number} ORDER BY created_at DESC;"),dbConnection)
-        
+    print(msgs)
     if msgs.empty:
         msg_response = f"Olá {name}, seja bem vindo ao bookBot!"
         send_msg(msg_response,number)
