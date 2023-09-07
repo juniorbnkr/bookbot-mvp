@@ -7,8 +7,6 @@ perm_token = os.getenv('perm_token')
 db_name = os.getenv('db_name')
 db_user = os.getenv('db_user')
 db_pass = os.getenv('db_pass')
-sqlEngine       = create_engine(f'mysql+pymysql://{db_user}:@{db_name}/bot_mvp?password={db_pass}', pool_recycle=3600)
-dbConnection    = sqlEngine.connect()
 
 def send_msg(msg,number):
     url = "https://graph.facebook.com/v17.0/116826464720753/messages/"
@@ -67,6 +65,9 @@ def get_last_msg(number):
     return df
 
 def next_msg(number,name,input_msg):
+    
+    sqlEngine       = create_engine(f'mysql+pymysql://{db_user}:@{db_name}/bot_mvp?password={db_pass}', pool_recycle=3600)
+    dbConnection    = sqlEngine.connect()
     if input_msg == 'Sim':
         msgs = pd.read_sql(text(f"SELECT * FROM bot_mvp.msg_log ml \
                      WHERE phone_number = {number} AND chap IS NOT NULL ORDER BY created_at DESC;"),dbConnection)
@@ -124,6 +125,9 @@ def next_msg(number,name,input_msg):
             return None
 
 def add_log(number,chap=None,template=None):
+    
+    sqlEngine       = create_engine(f'mysql+pymysql://{db_user}:@{db_name}/bot_mvp?password={db_pass}', pool_recycle=3600)
+    dbConnection    = sqlEngine.connect()
     if chap is None and template is None:
         raise Exception('One of chap or template is required')
     if chap is not None:
