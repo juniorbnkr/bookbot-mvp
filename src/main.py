@@ -26,7 +26,7 @@ def webhook_whatsapp():
     data = {}
     
     ## START MSG
-    if 'text' in data['entry'][0]['changes'][0]['value']['messages'][0]:
+    if 'text' in response['entry'][0]['changes'][0]['value']['messages'][0]:
         for entry in response["entry"]:
             for change in entry["changes"]:
                 if 'contacts' in change["value"]:
@@ -41,7 +41,7 @@ def webhook_whatsapp():
     ## END MSG
 
     ## START TEMPLATE
-    if 'button' in data['entry'][0]['changes'][0]['value']['messages'][0]:
+    if 'button' in response['entry'][0]['changes'][0]['value']['messages'][0]:
         number = change["value"]["contacts"][0]["wa_id"]
         name = change["value"]['contacts'][0]['profile']['name']            
         msg = data['entry'][0]['changes'][0]['value']['messages'][0]['button']['text']
