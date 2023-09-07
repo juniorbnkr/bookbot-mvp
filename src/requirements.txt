@@ -3,5 +3,5 @@ gunicorn
 requests
 httpx
 sqlalchemy 
-pandas
+pandas == 1.5.3
 pymysql
