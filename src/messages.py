@@ -110,7 +110,9 @@ def next_msg(number,name,input_msg):
     print(msgs)
     if msgs.empty:
         msg_response = f"Olá {name}, seja bem vindo ao bookBot!"
+        print('-------------------- send_msg')
         send_msg(msg_response,number)
+        print('-------------------- send template initial') 
         send_template('initial',number)
         add_log(number,False,'initial')
         return None
@@ -119,7 +121,9 @@ def next_msg(number,name,input_msg):
                      WHERE phone_number = {number} AND chap IS NOT NULL ORDER BY created_at DESC;"),dbConnection)
         if msgs.empty:
             msg_response = f"Olá {name}, seja bem vindo ao bookBot!"
-            send_msg(msg_response,number)
+            print('-------------------- send msg')
+            send_msg(msg_response,number)        
+            print('-------------------- send template initial')     
             send_template('initial',number)
             add_log(number,False,'initial')
             return None

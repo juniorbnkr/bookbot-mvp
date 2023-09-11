@@ -42,9 +42,9 @@ def webhook_whatsapp():
 
     ## START TEMPLATE
     if 'button' in response['entry'][0]['changes'][0]['value']['messages'][0]:
-        number = change["value"]["contacts"][0]["wa_id"]
-        name = change["value"]['contacts'][0]['profile']['name']            
-        msg = data['entry'][0]['changes'][0]['value']['messages'][0]['button']['text']
+        number = response['entry'][0]['changes'][0]["value"]["contacts"][0]["wa_id"]
+        name = response['entry'][0]['changes'][0]["value"]['contacts'][0]['profile']['name']            
+        msg = response['entry'][0]['changes'][0]['value']['messages'][0]['button']['text']
         msg_response = messages.next_msg(number,name,msg)
         time.sleep(2)
     ## END TEMPLATE
