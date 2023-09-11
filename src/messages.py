@@ -128,6 +128,16 @@ def next_msg(number,name,input_msg):
             send_template('initial',number)
             add_log(number,False,'initial')
             return None
+        else: 
+            msg_response = f'''Olá {name}, seja bem vindo de volta ao bookBot! \n 
+                Você parou no capítulo {msgs.iloc[0]['chap']}'''
+            print('-------------------- send msg')
+            send_msg(msg_response,number)        
+            print('-------------------- send template initial')     
+            send_template('retry',number)
+            add_log(number,False,'retry')
+            return None
+
 
 def add_log(number,chap=None,template=None):
     

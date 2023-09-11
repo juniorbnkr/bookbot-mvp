@@ -26,27 +26,29 @@ def webhook_whatsapp():
     data = {}
     
     ## START MSG
-    if 'text' in response['entry'][0]['changes'][0]['value']['messages'][0]:
-        for entry in response["entry"]:
-            for change in entry["changes"]:
-                if 'contacts' in change["value"]:
-                    data['type'] = change["field"]
-                    data['number'] = change["value"]["contacts"][0]["wa_id"]
-                    data['name'] = change["value"]['contacts'][0]['profile']['name']
-                    data['msg'] = change["value"]['messages'][0]['text']['body']
-        
-        if 'number' in data:
-            last_msg = messages.get_last_msg(data['number'])
-            next_msg = messages.next_msg(data['number'],data['name'],data['msg'])
+    if 'messages' in response['entry'][0]['changes'][0]['value']:
+        if 'text' in response['entry'][0]['changes'][0]['value']['messages'][0]:
+            for entry in response["entry"]:
+                for change in entry["changes"]:
+                    if 'contacts' in change["value"]:
+                        data['type'] = change["field"]
+                        data['number'] = change["value"]["contacts"][0]["wa_id"]
+                        data['name'] = change["value"]['contacts'][0]['profile']['name']
+                        data['msg'] = change["value"]['messages'][0]['text']['body']
+            
+            if 'number' in data:
+                last_msg = messages.get_last_msg(data['number'])
+                next_msg = messages.next_msg(data['number'],data['name'],data['msg'])
     ## END MSG
 
     ## START TEMPLATE
-    if 'button' in response['entry'][0]['changes'][0]['value']['messages'][0]:
-        number = response['entry'][0]['changes'][0]["value"]["contacts"][0]["wa_id"]
-        name = response['entry'][0]['changes'][0]["value"]['contacts'][0]['profile']['name']            
-        msg = response['entry'][0]['changes'][0]['value']['messages'][0]['button']['text']
-        msg_response = messages.next_msg(number,name,msg)
-        time.sleep(2)
+    if 'messages' in response['entry'][0]['changes'][0]['value']:
+        if 'button' in response['entry'][0]['changes'][0]['value']['messages'][0]:
+            number = response['entry'][0]['changes'][0]["value"]["contacts"][0]["wa_id"]
+            name = response['entry'][0]['changes'][0]["value"]['contacts'][0]['profile']['name']            
+            msg = response['entry'][0]['changes'][0]['value']['messages'][0]['button']['text']
+            msg_response = messages.next_msg(number,name,msg)
+            time.sleep(2)
     ## END TEMPLATE
 
     return jsonify({"status": "success"}, 200)
