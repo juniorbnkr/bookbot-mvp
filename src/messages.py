@@ -16,8 +16,9 @@ def send_msg(msg,number):
     "messaging_product": "whatsapp",
     "to": number,
     "type": "text",
-    "template": {
-        "name": "next"
+    "text": {
+        "preview_url": False,
+        "body": msg
     }
     })
     headers = {
@@ -57,7 +58,7 @@ def send_template(template,number):
     return response
 
 def get_last_msg(number):
-    sqlEngine       = create_engine(f'mysql+pymysql://{db_user}:@{db_name}/bot_mvp?password={db_pass}', pool_recycle=3600)
+    sqlEngine       = create_engine(f'mysql+pymysql://{db_user}:@{db_name}/bot_mvp?password={db_pass}', pool_recycle=3600, future=True)
     dbConnection    = sqlEngine.connect()
     df = pd.read_sql(text(f"SELECT * FROM bot_mvp.msg_log ml \
                      WHERE phone_number = {number} AND template IS NULL ORDER BY created_at DESC LIMIT 1;"),dbConnection)
@@ -66,7 +67,7 @@ def get_last_msg(number):
 
 def next_msg(number,name,input_msg):
     
-    sqlEngine       = create_engine(f'mysql+pymysql://{db_user}:@{db_name}/bot_mvp?password={db_pass}', pool_recycle=3600)
+    sqlEngine       = create_engine(f'mysql+pymysql://{db_user}:@{db_name}/bot_mvp?password={db_pass}', pool_recycle=3600, future=True)
     dbConnection    = sqlEngine.connect()
     if input_msg == 'Sim':
         msgs = pd.read_sql(text(f"SELECT * FROM bot_mvp.msg_log ml \
@@ -130,7 +131,7 @@ def next_msg(number,name,input_msg):
 
 def add_log(number,chap=None,template=None):
     
-    sqlEngine       = create_engine(f'mysql+pymysql://{db_user}:@{db_name}/bot_mvp?password={db_pass}', pool_recycle=3600)
+    sqlEngine       = create_engine(f'mysql+pymysql://{db_user}:@{db_name}/bot_mvp?password={db_pass}', pool_recycle=3600, future=True)
     dbConnection    = sqlEngine.connect()
     if chap is None and template is None:
         raise Exception('One of chap or template is required')
