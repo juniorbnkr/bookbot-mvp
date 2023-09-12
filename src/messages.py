@@ -133,11 +133,10 @@ def next_msg(number,name,input_msg):
                 Você parou no capítulo {msgs.iloc[0]['chap']}'''
             print('-------------------- send msg')
             send_msg(msg_response,number)        
-            print('-------------------- send template initial')     
-            send_template('retry',number)
-            add_log(number,False,'retry')
+            print('-------------------- send template return')     
+            send_template('return',number)
+            add_log(number,False,'return')
             return None
-
 
 def add_log(number,chap=None,template=None):
     
