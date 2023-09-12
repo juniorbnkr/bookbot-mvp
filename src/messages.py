@@ -82,7 +82,7 @@ def next_msg(number,name,input_msg):
                 msg += row['content'] + '\n'
             send_msg(msg,number)
             add_log(number,0,False)
-            time.sleep(60)
+            # time.sleep(60)
             send_template('next',number)
             add_log(number,False,'next')
             return msg
