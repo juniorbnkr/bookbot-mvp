@@ -10,7 +10,7 @@ db_pass = os.getenv('db_pass')
 
 def send_msg(msg,number):
     url = "https://graph.facebook.com/v17.0/116826464720753/messages/"
-    print(perm_token)
+    # print(perm_token)
 
     payload = json.dumps({
     "messaging_product": "whatsapp",
@@ -26,7 +26,6 @@ def send_msg(msg,number):
     'Authorization': 'Bearer '+perm_token
 
     }
-    print(payload)
     response = requests.request("POST", url, headers=headers, data=payload)
     # response = httpx.post(url, data=payload, headers=headers)
     # print(response.text)
@@ -35,7 +34,6 @@ def send_msg(msg,number):
 def send_template(template,number):
     
     url = "https://graph.facebook.com/v17.0/116826464720753/messages/"
-    print(perm_token)
 
     payload = json.dumps({
     "messaging_product": "whatsapp",
@@ -51,7 +49,7 @@ def send_template(template,number):
     'Authorization': 'Bearer '+perm_token
 
     }
-    print(payload)
+
     response = requests.request("POST", url, headers=headers, data=payload)
     # response = httpx.post(url, data=payload, headers=headers)
     # print(response.text)
@@ -81,9 +79,9 @@ def next_msg(number,name,input_msg):
             for index, row in df.iterrows():
                 msg += row['content'] + '\n'
             send_msg(msg,number)
-            add_log(number,0,False)
+            add_log(number,0,None)
             send_template('next',number)
-            add_log(number,False,'next')
+            add_log(number,None,'next')
             return msg
 
     if input_msg == 'Próximo Capítulo':
@@ -99,9 +97,10 @@ def next_msg(number,name,input_msg):
             for index, row in df.iterrows():
                 msg += row['content'] + '\n'
             send_msg(msg,number)
-            add_log(number,last_cap+1,False)
+            print('-------------------- send_msg 100')
+            add_log(number,last_cap+1,None)
             send_template('next',number)
-            add_log(number,False,'next')
+            add_log(number,None,'next')
             return None
    
     msgs = pd.read_sql(text(f"SELECT * FROM bot_mvp.msg_log ml \
@@ -109,31 +108,31 @@ def next_msg(number,name,input_msg):
     print(msgs)
     if msgs.empty:
         msg_response = f"Olá {name}, seja bem vindo ao bookBot!"
-        print('-------------------- send_msg')
+        print('-------------------- send_msg 110')
         send_msg(msg_response,number)
-        print('-------------------- send template initial') 
+        print('-------------------- send template initial 112') 
         send_template('initial',number)
-        add_log(number,False,'initial')
+        add_log(number,None,'initial')
         return None
     else:
         msgs = pd.read_sql(text(f"SELECT * FROM bot_mvp.msg_log ml \
                      WHERE phone_number = {number} AND chap IS NOT NULL ORDER BY created_at DESC;"),dbConnection)
         if msgs.empty:
             msg_response = f"Olá {name}, seja bem vindo ao bookBot!"
-            print('-------------------- send msg')
+            print('-------------------- send msg 121')
             send_msg(msg_response,number)        
-            print('-------------------- send template initial')     
+            print('-------------------- send template initial 123')     
             send_template('initial',number)
-            add_log(number,False,'initial')
+            add_log(number,None,'initial')
             return None
         else: 
             msg_response = f'''Olá {name}, seja bem vindo de volta ao bookBot! \n 
                 Você parou no capítulo {msgs.iloc[0]['chap']}'''
-            print('-------------------- send msg')
+            print('-------------------- send msg 130')
             send_msg(msg_response,number)        
-            print('-------------------- send template return')     
+            print('-------------------- send template return 133')     
             send_template('return',number)
-            add_log(number,False,'return')
+            add_log(number,None,'return')
             return None
 
 def add_log(number,chap=None,template=None):
