@@ -23,8 +23,12 @@ def webhook_whatsapp():
     response = request.get_json()
     print(response)
     messages.save_event(response)
+
+    if 'sent'  in response \
+        or 'read'  in response\
+        or 'billable'  in response:
+        return jsonify({"status": "success"}, 200)
     
-    return jsonify({"status": "success"}, 200)
     data = {}
     
     ## START MSG
