@@ -24,6 +24,7 @@ def webhook_whatsapp():
     print(response)
     messages.save_event(response)
     
+    return jsonify({"status": "success"}, 200)
     data = {}
     
     ## START MSG
