@@ -145,6 +145,6 @@ def add_log(number,chap=None,template=None):
         dbConnection.execute(text(f"INSERT INTO bot_mvp.msg_log (phone_number, chap) VALUES ({number},{chap});"))
         dbConnection.commit()
     elif template is not None:
-        dbConnection.execute(text(f"INSERT INTO bot_mvp.msg_log (phone_number, template) VALUES ({number},{template});"))
+        dbConnection.execute(text(f"INSERT INTO bot_mvp.msg_log (phone_number, template) VALUES ({number},'{template}');"))
         dbConnection.commit()
     return None
