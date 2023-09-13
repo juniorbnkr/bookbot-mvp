@@ -152,6 +152,6 @@ def add_log(number,chap=None,template=None):
 def save_event(event):
     sqlEngine       = create_engine(f'mysql+pymysql://{db_user}:@{db_name}/bot_mvp?password={db_pass}', pool_recycle=3600, future=True)
     dbConnection    = sqlEngine.connect()
-    dbConnection.execute(text(f"INSERT INTO bot_mvp.events (event) VALUES ('{event}');"))
+    dbConnection.execute(text(f'INSERT INTO bot_mvp.events (event) VALUES ("{event}");'))
     dbConnection.commit()
     return None
