@@ -22,6 +22,7 @@ def webhook_whatsapp():
 
     response = request.get_json()
     print(response)
+    messages.save_event(response)
     
     data = {}
     
@@ -39,6 +40,7 @@ def webhook_whatsapp():
             if 'number' in data:
                 last_msg = messages.get_last_msg(data['number'])
                 next_msg = messages.next_msg(data['number'],data['name'],data['msg'])
+            return jsonify({"status": "success"}, 200)
     ## END MSG
 
     ## START TEMPLATE
@@ -48,7 +50,6 @@ def webhook_whatsapp():
             name = response['entry'][0]['changes'][0]["value"]['contacts'][0]['profile']['name']            
             msg = response['entry'][0]['changes'][0]['value']['messages'][0]['button']['text']
             msg_response = messages.next_msg(number,name,msg)
-            time.sleep(2)
     ## END TEMPLATE
 
     return jsonify({"status": "success"}, 200)
