@@ -26,7 +26,7 @@ def webhook_whatsapp():
     event = Event(response)
     event.save_event()
     if event.type == 'receive':
-        
+        print( 'entrou receive')
         ## START MSG
         if 'messages' in response['entry'][0]['changes'][0]['value']:
             if 'text' in response['entry'][0]['changes'][0]['value']['messages'][0]:
@@ -51,6 +51,7 @@ def webhook_whatsapp():
         message = Messages(number,name,msg)
 
         if not message.check_block():
+            print('NOT BLOCKED')
             message.send_msg()
 
     return jsonify({"status": "success"}, 200)

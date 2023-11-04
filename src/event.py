@@ -11,7 +11,6 @@ class Event():
         self.db_user = os.getenv('db_user')
         self.db_pass = os.getenv('db_pass')
         self.type = self.get_type()
-        print(self.type)
         return None
     
     def check_event(self):
