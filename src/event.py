@@ -25,10 +25,10 @@ class Event():
         return None
     
     def get_type(self) -> str:
-        if 'sent' in self.event:
+        if 'sent' in str(self.event):
             return 'sent'
-        if 'read' in self.event:
+        if 'read' in str(self.event):
             return 'read'
-        if "'type': 'text'" in self.event:
+        if "'type': 'text'" in str(self.event):
             return 'receive'
         return None
