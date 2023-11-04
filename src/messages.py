@@ -45,7 +45,7 @@ class Messages():
         }
         response = requests.request("POST", url, headers=headers, data=payload)
         # response = httpx.post(url, data=payload, headers=headers)
-        # print(response.text)
+        print(response.text)
         return response
 
     def send_template(self):
