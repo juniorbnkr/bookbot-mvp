@@ -137,17 +137,17 @@ class Messages():
                 self.template = 'return'
                 return None
 
-    def add_log(number,chap=None,template=None):
+    def add_log(self,number,chap=None,template=None):
         
-        sqlEngine       = create_engine(f'mysql+pymysql://{db_user}:@{db_name}/bot_mvp?password={db_pass}', pool_recycle=3600, future=True)
+        sqlEngine       = create_engine(f'mysql+pymysql://{self.db_user}:@{self.db_name}/bot_mvp?password={self.db_pass}', pool_recycle=3600, future=True)
         dbConnection    = sqlEngine.connect()
         if chap is None and template is None:
             raise Exception('One of chap or template is required')
         if chap is not None:
-            dbConnection.execute(text(f"INSERT INTO bot_mvp.msg_log (phone_number, chap) VALUES ({number},{chap});"))
+            dbConnection.execute(text(f"INSERT INTO bot_mvp.msg_log (phone_number, chap,block) VALUES ({number},{chap},1);"))
             dbConnection.commit()
         elif template is not None:
-            dbConnection.execute(text(f"INSERT INTO bot_mvp.msg_log (phone_number, template) VALUES ({number},'{template}');"))
+            dbConnection.execute(text(f"INSERT INTO bot_mvp.msg_log (phone_number, template,block) VALUES ({number},'{template},1');"))
             dbConnection.commit()
         return None
 

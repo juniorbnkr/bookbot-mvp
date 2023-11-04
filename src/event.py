@@ -30,4 +30,4 @@ class Event():
             return 'read'
         if "'type': 'text'" in self.event:
             return 'receive'
-        return self.type
+        return None
