@@ -6,15 +6,15 @@ import pandas as pd
 class Messages():
 
     def __init__(self,number,name,received_msg) -> None:
+        self.perm_token = os.getenv('perm_token')
+        self.db_name = os.getenv('db_name')
+        self.db_user = os.getenv('db_user')
+        self.db_pass = os.getenv('db_pass')
         self.number = number
         self.name = name
         self.received_msg = received_msg
         self.msg_to_send = self.next_msg()
         self.template = ''
-        self.perm_token = os.getenv('perm_token')
-        self.db_name = os.getenv('db_name')
-        self.db_user = os.getenv('db_user')
-        self.db_pass = os.getenv('db_pass')
         return None    
 
     def check_block(self):
