@@ -112,30 +112,30 @@ class Messages():
                 
                 msg += "n Envie 'Próximo Capítulo' para ver o capítulo seguinte"
                 self.msg_to_send = msg
-                return None
+                return msg
     
         msgs = pd.read_sql(text(f"SELECT * FROM bot_mvp.msg_log ml \
                         WHERE phone_number = {self.number} ORDER BY created_at DESC;"),dbConnection)
         print(msgs)
         if msgs.empty:
-            msg_response = f"Olá {self.name}, seja bem vindo ao bookBot!"
-            self.msg_to_send = msg_response
+            msg = f"Olá {self.name}, seja bem vindo ao bookBot!"
+            self.msg_to_send = msg
             self.template = 'initial'
-            return None
+            return msg
         else:
             msgs = pd.read_sql(text(f"SELECT * FROM bot_mvp.msg_log ml \
                         WHERE phone_number = {self.number} AND chap IS NOT NULL ORDER BY created_at DESC;"),dbConnection)
             if msgs.empty:
-                msg_response = f"Olá {self.name}, seja bem vindo ao bookBot!"
-                self.msg_to_send = msg_response
+                msg = f"Olá {self.name}, seja bem vindo ao bookBot!"
+                self.msg_to_send = msg
                 self.template = 'initial'
-                return None
+                return msg
             else: 
-                msg_response = f'''Olá {self.name}, seja bem vindo de volta ao bookBot! \n 
+                msg = f'''Olá {self.name}, seja bem vindo de volta ao bookBot! \n 
                     Você parou no capítulo {msgs.iloc[0]['chap']} \n Digite Sim para continuar'''
-                self.msg_to_send = msg_response
+                self.msg_to_send = msg
                 self.template = 'return'
-                return None
+                return msg
 
     def add_log(self,number,chap=None,template=None):
         
