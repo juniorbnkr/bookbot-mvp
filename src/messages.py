@@ -122,7 +122,7 @@ class Messages():
     
         msgs = pd.read_sql(text(f"SELECT * FROM bot_mvp.msg_log ml \
                         WHERE phone_number = {self.number} ORDER BY created_at DESC;"),dbConnection)
-        print(msgs)
+
         if msgs.empty:
             msg = f"Olá {self.name}, seja bem vindo ao bookBot!"
             self.msg_to_send = msg
