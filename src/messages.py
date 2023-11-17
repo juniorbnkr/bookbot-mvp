@@ -46,6 +46,8 @@ class Messages():
         response = requests.request("POST", url, headers=headers, data=payload)
         # response = httpx.post(url, data=payload, headers=headers)
         print(response.text)
+        if self.template != '':
+            self.send_template()
         return response
 
     def send_template(self):
@@ -110,7 +112,8 @@ class Messages():
                 for index, row in df.iterrows():
                     msg += row['content'] + '\n'
                 
-                msg += "n Envie 'Próximo Capítulo' para ver o capítulo seguinte"
+                # msg += "\n Envie 'Próximo Capítulo' para ver o capítulo seguinte"
+                self.template = 'next'
                 self.msg_to_send = msg
                 return msg
     
