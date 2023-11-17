@@ -13,8 +13,8 @@ class Messages():
         self.number = number
         self.name = name
         self.received_msg = received_msg
-        self.msg_to_send = self.next_msg()
         self.template = ''
+        self.msg_to_send = self.next_msg()
         return None    
 
     def check_block(self):
