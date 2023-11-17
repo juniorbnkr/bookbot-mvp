@@ -45,9 +45,8 @@ class Messages():
         }
         response = requests.request("POST", url, headers=headers, data=payload)
         # response = httpx.post(url, data=payload, headers=headers)
-        print(self.template)
+        print('template',self.template)
         if self.template != '':
-            print('template')
             self.send_template()
         return response
 
@@ -98,6 +97,8 @@ class Messages():
                 for index, row in df.iterrows():
                     msg += row['content'] + '\n'
                 self.msg_to_send = msg
+                self.template = 'next'
+                self.add_log(self.number,chap=0)
                 return msg
 
         if self.received_msg.lower().replace('í', 'i').replace('ó', 'o') == 'proximo capitulo':
@@ -116,6 +117,7 @@ class Messages():
                 # msg += "\n Envie 'Próximo Capítulo' para ver o capítulo seguinte"
                 self.template = 'next'
                 self.msg_to_send = msg
+                self.add_log(self.number,chap=last_cap+1)
                 return msg
     
         msgs = pd.read_sql(text(f"SELECT * FROM bot_mvp.msg_log ml \
@@ -141,17 +143,17 @@ class Messages():
                 self.template = 'return'
                 return msg
 
-    def add_log(self,number,chap=None,template=None):
+    def add_log(self,chap=None,template=None):
         
         sqlEngine       = create_engine(f'mysql+pymysql://{self.db_user}:@{self.db_name}/bot_mvp?password={self.db_pass}', pool_recycle=3600, future=True)
         dbConnection    = sqlEngine.connect()
         if chap is None and template is None:
             raise Exception('One of chap or template is required')
         if chap is not None:
-            dbConnection.execute(text(f"INSERT INTO bot_mvp.msg_log (phone_number, chap,block) VALUES ({number},{chap},1);"))
+            dbConnection.execute(text(f"INSERT INTO bot_mvp.msg_log (phone_number, chap,block) VALUES ({self.number},{chap},1);"))
             dbConnection.commit()
         elif template is not None:
-            dbConnection.execute(text(f"INSERT INTO bot_mvp.msg_log (phone_number, template,block) VALUES ({number},'{template},1');"))
+            dbConnection.execute(text(f"INSERT INTO bot_mvp.msg_log (phone_number, template,block) VALUES ({self.number},'{template},1');"))
             dbConnection.commit()
         return None
 
