@@ -47,6 +47,7 @@ class Messages():
         # response = httpx.post(url, data=payload, headers=headers)
         print(response.text)
         if self.template != '':
+            print('template')
             self.send_template()
         return response
 
