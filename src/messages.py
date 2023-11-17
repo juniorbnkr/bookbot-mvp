@@ -98,7 +98,7 @@ class Messages():
                     msg += row['content'] + '\n'
                 self.msg_to_send = msg
                 self.template = 'next'
-                self.add_log(self.number,chap=0)
+                self.add_log(chap=0)
                 return msg
 
         if self.received_msg.lower().replace('í', 'i').replace('ó', 'o') == 'proximo capitulo':
