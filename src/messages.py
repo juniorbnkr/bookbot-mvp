@@ -127,6 +127,7 @@ class Messages():
             msg = f"Olá {self.name}, seja bem vindo ao bookBot!"
             self.msg_to_send = msg
             self.template = 'initial'
+            self.add_log(self.number,template='initial')
             return msg
         else:
             msgs = pd.read_sql(text(f"SELECT * FROM bot_mvp.msg_log ml \
@@ -135,12 +136,14 @@ class Messages():
                 msg = f"Olá {self.name}, seja bem vindo ao bookBot!"
                 self.msg_to_send = msg
                 self.template = 'initial'
+                self.add_log(self.number,template='initial')
                 return msg
             else: 
                 msg = f'''Olá {self.name}, seja bem vindo de volta ao bookBot! \n 
                     Você parou no capítulo {msgs.iloc[0]['chap']} \n Digite Sim para continuar'''
                 self.msg_to_send = msg
                 self.template = 'return'
+                self.add_log(self.number,template='return')
                 return msg
 
     def add_log(self,chap=None,template=None):
