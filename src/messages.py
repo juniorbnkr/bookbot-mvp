@@ -39,7 +39,7 @@ class Messages():
         }
         })
         headers = {
-        'Content-Type': 'application/json',
+        'Contehttps://web.whatsapp.com/nt-Type': 'application/json',
         'Authorization': 'Bearer '+self.perm_token
 
         }
@@ -117,7 +117,7 @@ class Messages():
                 # msg += "\n Envie 'Próximo Capítulo' para ver o capítulo seguinte"
                 self.template = 'next'
                 self.msg_to_send = msg
-                self.add_log(self.number,chap=last_cap+1)
+                self.add_log(chap=last_cap+1)
                 return msg
     
         msgs = pd.read_sql(text(f"SELECT * FROM bot_mvp.msg_log ml \
@@ -127,7 +127,7 @@ class Messages():
             msg = f"Olá {self.name}, seja bem vindo ao bookBot!"
             self.msg_to_send = msg
             self.template = 'initial'
-            self.add_log(self.number,template='initial')
+            self.add_log(template='initial')
             return msg
         else:
             msgs = pd.read_sql(text(f"SELECT * FROM bot_mvp.msg_log ml \
@@ -136,14 +136,14 @@ class Messages():
                 msg = f"Olá {self.name}, seja bem vindo ao bookBot!"
                 self.msg_to_send = msg
                 self.template = 'initial'
-                self.add_log(self.number,template='initial')
+                self.add_log(template='initial')
                 return msg
             else: 
                 msg = f'''Olá {self.name}, seja bem vindo de volta ao bookBot! \n 
                     Você parou no capítulo {msgs.iloc[0]['chap']} \n Digite Sim para continuar'''
                 self.msg_to_send = msg
                 self.template = 'return'
-                self.add_log(self.number,template='return')
+                self.add_log(template='return')
                 return msg
 
     def add_log(self,chap=None,template=None):
