@@ -25,6 +25,7 @@ def webhook_whatsapp():
     print(response)
     event = Event(response)
     event.save_event()
+    print(event.type)
     if event.type == 'receive':
         ## START MSG
         if 'messages' in response['entry'][0]['changes'][0]['value']:
