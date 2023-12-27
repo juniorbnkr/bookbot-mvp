@@ -156,7 +156,7 @@ class Messages():
             dbConnection.execute(text(f"INSERT INTO bot_mvp.msg_log (phone_number, chap,block) VALUES ({self.number},{chap},1);"))
             dbConnection.commit()
         elif template is not None:
-            dbConnection.execute(text(f"INSERT INTO bot_mvp.msg_log (phone_number, template,block) VALUES ({self.number},'{template},1');"))
+            dbConnection.execute(text(f"INSERT INTO bot_mvp.msg_log (phone_number, template,block) VALUES ({self.number},'{template}',1);"))
             dbConnection.commit()
         return None
 
