@@ -51,6 +51,7 @@ def webhook_whatsapp():
         message = Messages(number,name,msg)
 
         if not message.check_block():
+            print('not blocked')
             message.send_msg()
 
     return jsonify({"status": "success"}, 200)
