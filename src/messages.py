@@ -45,12 +45,13 @@ class Messages():
         }
         })
         headers = {
-        'Contehttps://web.whatsapp.com/nt-Type': 'application/json',
+        'Content-Type': 'application/json',
         'Authorization': 'Bearer '+self.perm_token
 
         }
         response = requests.request("POST", url, headers=headers, data=payload)
-        print(response)
+        print('post feito')
+        print(response.status_code)
         print(response.text)
         # response = httpx.post(url, data=payload, headers=headers)
         print('template',self.template)
