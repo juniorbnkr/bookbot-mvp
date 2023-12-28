@@ -32,6 +32,7 @@ class Messages():
     
     def send_msg(self):
         self.msg_to_send = self.next_msg()
+        print(self.msg_to_send)
         url = "https://graph.facebook.com/v17.0/116826464720753/messages/"
 
         payload = json.dumps({
@@ -90,6 +91,7 @@ class Messages():
     def next_msg(self):
         sqlEngine       = create_engine(f'mysql+pymysql://{self.db_user}:@{self.db_name}/bot_mvp?password={self.db_pass}', pool_recycle=3600, future=True)
         dbConnection    = sqlEngine.connect()
+        print(self.received_msg)
         if self.received_msg.lower() == 'sim':
             msgs = pd.read_sql(text(f"SELECT * FROM bot_mvp.msg_log ml \
                         WHERE phone_number = {self.number} AND chap IS NOT NULL ORDER BY created_at DESC;"),dbConnection)
