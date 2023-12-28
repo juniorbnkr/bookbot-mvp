@@ -50,6 +50,8 @@ class Messages():
 
         }
         response = requests.request("POST", url, headers=headers, data=payload)
+        print(response)
+        print(response.text)
         # response = httpx.post(url, data=payload, headers=headers)
         print('template',self.template)
         if self.template != '':
