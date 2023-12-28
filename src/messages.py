@@ -14,7 +14,7 @@ class Messages():
         self.name = name
         self.received_msg = received_msg
         self.template = ''
-        self.msg_to_send = self.next_msg()
+        self.msg_to_send = ''
         return None    
 
     def check_block(self):
@@ -31,6 +31,7 @@ class Messages():
         return False
     
     def send_msg(self):
+        self.msg_to_send = self.next_msg()
         url = "https://graph.facebook.com/v17.0/116826464720753/messages/"
 
         payload = json.dumps({
