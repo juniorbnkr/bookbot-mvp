@@ -22,6 +22,10 @@ class Messages():
         dbConnection    = sqlEngine.connect()
         msgs = pd.read_sql(text(f"SELECT * FROM bot_mvp.msg_log ml WHERE phone_number = {self.number} \
                                 AND block = 1 ORDER BY created_at DESC;"),dbConnection)
+
+        print(msgs.empty)
+        print(msgs)
+        print(len(msgs))
         if not msgs.empty:
             return True
         return False
