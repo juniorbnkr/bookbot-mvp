@@ -50,7 +50,6 @@ def webhook_whatsapp():
 
         message = Messages(number,name,msg)
         
-        print(message.check_block())
         if not message.check_block():
             print('not blocked')
             message.send_msg()
