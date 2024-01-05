@@ -28,6 +28,6 @@ class Event():
             return 'sent'
         if 'read' in str(self.event):
             return 'read'
-        if "'type': 'text'" in str(self.event):
+        if "'type': 'text'" in str(self.event) or "'type': 'button'" in str(self.event):
             return 'receive'
         return None
