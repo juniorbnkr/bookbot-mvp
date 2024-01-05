@@ -30,6 +30,13 @@ class Messages():
             return True
         return False
     
+    def unblock(self):
+        sqlEngine       = create_engine(f'mysql+pymysql://{self.db_user}:@{self.db_name}/bot_mvp?password={self.db_pass}', pool_recycle=3600, future=True)
+        dbConnection    = sqlEngine.connect()
+        dbConnection.execute(text(f'UPDATE bot_mvp.msg_log SET block = 0 WHERE phone_number = {self.number};'))
+        dbConnection.commit()
+        return None
+    
     def send_msg(self):
         self.msg_to_send = self.next_msg()
         print(self.msg_to_send)
