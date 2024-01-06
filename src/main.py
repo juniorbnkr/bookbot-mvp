@@ -27,12 +27,15 @@ def webhook_whatsapp():
     event.save_event()
     print(event.type)
 
-    if event.type == 'read':
+    if event.type == 'read' or event.type == 'delivered':
         number = response['entry'][0]['changes'][0]["value"]["statuses"][0]["recipient_id"]
         message = Messages(number,None,None)
+        if event.type == 'delivered':
+            time.sleep(5)
         message.unblock()
 
     if event.type == 'receive':
+        time.sleep(5)
         ## START MSG
         if 'messages' in response['entry'][0]['changes'][0]['value']:
             if 'text' in response['entry'][0]['changes'][0]['value']['messages'][0]:

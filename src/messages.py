@@ -39,7 +39,7 @@ class Messages():
     
     def send_msg(self):
         self.msg_to_send = self.next_msg()
-        print(self.msg_to_send)
+        # print(self.msg_to_send)
         url = "https://graph.facebook.com/v17.0/116826464720753/messages/"
 
         payload = json.dumps({

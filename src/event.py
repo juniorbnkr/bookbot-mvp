@@ -30,4 +30,6 @@ class Event():
             return 'read'
         if "'type': 'text'" in str(self.event) or "'type': 'button'" in str(self.event):
             return 'receive'
+        if "'status': 'delivered'" in str(self.event):
+            return 'delivered'
         return None
