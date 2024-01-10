@@ -134,7 +134,7 @@ class Messages():
                 return msgs
 
         if self.received_msg.lower().replace('í', 'i').replace('ó', 'o') == 'proximo capitulo' \
-            or self.received_msg == 1:
+            or self.received_msg == '1':
             msgs = pd.read_sql(text(f"SELECT * FROM bot_mvp.msg_log ml \
                         WHERE phone_number = {self.number} AND chap IS NOT NULL ORDER BY created_at DESC;"),dbConnection)
             last_msg = msgs.iloc[0]
