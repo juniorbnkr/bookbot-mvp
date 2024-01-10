@@ -35,7 +35,6 @@ def webhook_whatsapp():
         message.unblock()
 
     if event.type == 'receive':
-        time.sleep(5)
         ## START MSG
         if 'messages' in response['entry'][0]['changes'][0]['value']:
             if 'text' in response['entry'][0]['changes'][0]['value']['messages'][0]:
@@ -63,7 +62,7 @@ def webhook_whatsapp():
             print('not blocked')
             message.send_msg()
             print('template',message.template)
-            print('msg',message.msg_to_send)
+            print('msg = ',message.msg_to_send)
             if message.template != '':
                 message.send_template()
 
