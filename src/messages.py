@@ -131,7 +131,7 @@ class Messages():
                 self.msg_to_send = msgs
                 #self.template = 'next'
                 self.add_log(chap=0)
-                return msg
+                return msgs
 
         if self.received_msg.lower().replace('í', 'i').replace('ó', 'o') == 'proximo capitulo' \
             or self.received_msg == 1:
@@ -152,7 +152,7 @@ class Messages():
                 msgs = [msg,'Digite 1 para receber o capítulo seguinte']
                 self.msg_to_send = msgs
                 self.add_log(chap=last_cap+1)
-                return msg
+                return msgs
     
         msgs = pd.read_sql(text(f"SELECT * FROM bot_mvp.msg_log ml \
                         WHERE phone_number = {self.number} ORDER BY created_at DESC;"),dbConnection)
@@ -163,7 +163,7 @@ class Messages():
             self.msg_to_send = msgs
             # self.template = 'initial'
             self.add_log(template='initial')
-            return msg
+            return msgs
         else:
             msgs = pd.read_sql(text(f"SELECT * FROM bot_mvp.msg_log ml \
                         WHERE phone_number = {self.number} AND chap IS NOT NULL ORDER BY created_at DESC;"),dbConnection)
@@ -173,7 +173,7 @@ class Messages():
                 self.msg_to_send = msgs
                 # self.template = 'initial'
                 self.add_log(template='initial')
-                return msg
+                return msgs
             else: 
                 msg = f'''Olá {self.name}, seja bem vindo de volta ao bookBot! \n 
                     Você parou no capítulo {msgs.iloc[0]['chap']} \n Digite 1 para continuar'''
