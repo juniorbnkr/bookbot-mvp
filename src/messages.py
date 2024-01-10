@@ -140,7 +140,7 @@ class Messages():
             if not msgs.empty:
                 last_msg = msgs.iloc[0]
             else:
-                last_msg = None
+                last_msg = {'chap': None}
 
             if last_msg['chap'] is not None:
                 last_cap = last_msg['chap']
@@ -154,7 +154,7 @@ class Messages():
             msg = ''
             for index, row in df.iterrows():
                 msg += row['content'] + '\n'
-                
+
             # msg += "\n Envie 'Próximo Capítulo' para ver o capítulo seguinte"
             #self.template = 'next'
             msgs = [msg,'Digite 1 para receber o próximo capítulo']
