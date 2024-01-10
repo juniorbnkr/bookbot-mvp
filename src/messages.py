@@ -137,23 +137,31 @@ class Messages():
             or self.received_msg == '1':
             msgs = pd.read_sql(text(f"SELECT * FROM bot_mvp.msg_log ml \
                         WHERE phone_number = {self.number} AND chap IS NOT NULL ORDER BY created_at DESC;"),dbConnection)
-            last_msg = msgs.iloc[0]
+            if not msgs.empty:
+                last_msg = msgs.iloc[0]
+            else:
+                last_msg = None
+
             if last_msg['chap'] is not None:
                 last_cap = last_msg['chap']
                 print(last_cap)
                 df = pd.read_sql(text(f"SELECT * FROM bot_mvp.memoriasBras ml \
                             WHERE cap = {last_cap + 1} ORDER BY line asc;"),dbConnection)    
-                msg = ''
-                for index, row in df.iterrows():
-                    msg += row['content'] + '\n'
+            else:
+                df = pd.read_sql(text(f"SELECT * FROM bot_mvp.memoriasBras ml \
+                            WHERE cap = 0 ORDER BY line asc;"),dbConnection)
+            
+            msg = ''
+            for index, row in df.iterrows():
+                msg += row['content'] + '\n'
                 
-                # msg += "\n Envie 'Próximo Capítulo' para ver o capítulo seguinte"
-                #self.template = 'next'
-                msgs = [msg,'Digite 1 para receber o capítulo seguinte']
-                self.msg_to_send = msgs
-                self.add_log(chap=last_cap+1)
-                return msgs
-    
+            # msg += "\n Envie 'Próximo Capítulo' para ver o capítulo seguinte"
+            #self.template = 'next'
+            msgs = [msg,'Digite 1 para receber o próximo capítulo']
+            self.msg_to_send = msgs
+            self.add_log(chap=last_cap+1)
+            return msgs
+
         msgs = pd.read_sql(text(f"SELECT * FROM bot_mvp.msg_log ml \
                         WHERE phone_number = {self.number} ORDER BY created_at DESC;"),dbConnection)
 
