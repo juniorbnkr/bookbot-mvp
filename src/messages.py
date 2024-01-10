@@ -148,6 +148,7 @@ class Messages():
                 df = pd.read_sql(text(f"SELECT * FROM bot_mvp.memoriasBras ml \
                             WHERE cap = {last_cap + 1} ORDER BY line asc;"),dbConnection)    
             else:
+                last_cap = -1
                 df = pd.read_sql(text(f"SELECT * FROM bot_mvp.memoriasBras ml \
                             WHERE cap = 0 ORDER BY line asc;"),dbConnection)
             
