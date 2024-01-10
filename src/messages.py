@@ -39,31 +39,45 @@ class Messages():
     
     def send_msg(self):
         self.msg_to_send = self.next_msg()
-        # print(self.msg_to_send)
+        # print(self.msg_
+        # to_send)
         url = "https://graph.facebook.com/v17.0/116826464720753/messages/"
+        
+        if isinstance(self.msg_to_send,list):
+            response = []
+            for msg in self.msg_to_send:
+                payload = json.dumps({
+                "messaging_product": "whatsapp",
+                "to": self.number,
+                "type": "text",
+                "text": {
+                    "preview_url": False,
+                    "body": msg
+                }
+                })
+                headers = {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer '+self.perm_token
 
-        payload = json.dumps({
-        "messaging_product": "whatsapp",
-        "to": self.number,
-        "type": "text",
-        "text": {
-            "preview_url": False,
-            "body": self.msg_to_send
-        }
-        })
-        headers = {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer '+self.perm_token
+                }
+                response.append(requests.request("POST", url, headers=headers, data=payload))
+        else:
+            payload = json.dumps({
+            "messaging_product": "whatsapp",
+            "to": self.number,
+            "type": "text",
+            "text": {
+                "preview_url": False,
+                "body": self.msg_to_send
+            }
+            })
+            headers = {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer '+self.perm_token
 
-        }
-        response = requests.request("POST", url, headers=headers, data=payload)
-        print('post feito')
-        print(response.status_code)
-        print(response.text)
-        # response = httpx.post(url, data=payload, headers=headers)
-        print('template',self.template)
-        if self.template != '':
-            self.send_template()
+            }
+            response = requests.request("POST", url, headers=headers, data=payload)
+   
         return response
 
     def send_template(self):
@@ -113,12 +127,14 @@ class Messages():
                 msg = ''
                 for index, row in df.iterrows():
                     msg += row['content'] + '\n'
-                self.msg_to_send = msg
-                self.template = 'next'
+                msgs = [msg,'Digite 1 para receber o capítulo seguinte']
+                self.msg_to_send = msgs
+                #self.template = 'next'
                 self.add_log(chap=0)
                 return msg
 
-        if self.received_msg.lower().replace('í', 'i').replace('ó', 'o') == 'proximo capitulo':
+        if self.received_msg.lower().replace('í', 'i').replace('ó', 'o') == 'proximo capitulo' \
+            or self.received_msg == 1:
             msgs = pd.read_sql(text(f"SELECT * FROM bot_mvp.msg_log ml \
                         WHERE phone_number = {self.number} AND chap IS NOT NULL ORDER BY created_at DESC;"),dbConnection)
             last_msg = msgs.iloc[0]
@@ -132,8 +148,9 @@ class Messages():
                     msg += row['content'] + '\n'
                 
                 # msg += "\n Envie 'Próximo Capítulo' para ver o capítulo seguinte"
-                self.template = 'next'
-                self.msg_to_send = msg
+                #self.template = 'next'
+                msgs = [msg,'Digite 1 para receber o capítulo seguinte']
+                self.msg_to_send = msgs
                 self.add_log(chap=last_cap+1)
                 return msg
     
@@ -142,8 +159,9 @@ class Messages():
 
         if msgs.empty:
             msg = f"Olá {self.name}, seja bem vindo ao bookBot!"
-            self.msg_to_send = msg
-            self.template = 'initial'
+            msgs = [msg,'Digite 1 para iniciar a leitura do livro Memórias Póstumas de Brás Cubas']
+            self.msg_to_send = msgs
+            # self.template = 'initial'
             self.add_log(template='initial')
             return msg
         else:
@@ -151,15 +169,16 @@ class Messages():
                         WHERE phone_number = {self.number} AND chap IS NOT NULL ORDER BY created_at DESC;"),dbConnection)
             if msgs.empty:
                 msg = f"Olá {self.name}, seja bem vindo ao bookBot!"
-                self.msg_to_send = msg
-                self.template = 'initial'
+                msgs = [msg,'Digite 1 para iniciar a leitura do livro Memórias Pósstumas de Brás Cubas']
+                self.msg_to_send = msgs
+                # self.template = 'initial'
                 self.add_log(template='initial')
                 return msg
             else: 
                 msg = f'''Olá {self.name}, seja bem vindo de volta ao bookBot! \n 
-                    Você parou no capítulo {msgs.iloc[0]['chap']} \n Digite Sim para continuar'''
+                    Você parou no capítulo {msgs.iloc[0]['chap']} \n Digite 1 para continuar'''
                 self.msg_to_send = msg
-                self.template = 'return'
+                # self.template = 'return'
                 self.add_log(template='return')
                 return msg
 

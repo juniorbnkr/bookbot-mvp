@@ -64,6 +64,8 @@ def webhook_whatsapp():
             message.send_msg()
             print('template',message.template)
             print('msg',message.msg_to_send)
+            if message.template != '':
+                message.send_template()
 
     return jsonify({"status": "success"}, 200)
 
