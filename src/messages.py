@@ -128,7 +128,7 @@ class Messages():
                 msg = ''
                 for index, row in df.iterrows():
                     msg += row['content'] + '\n'
-                msgs = [msg,'Digite 1 para receber o capítulo seguinte']
+                msgs = [msg,' \n \n Digite: \n 1 para receber o capítulo seguinte \n 2 para ver o índice. \n \n ']
                 self.msg_to_send = msgs
                 #self.template = 'next'
                 self.add_log(chap=0)
@@ -159,7 +159,7 @@ class Messages():
 
             # msg += "\n Envie 'Próximo Capítulo' para ver o capítulo seguinte"
             #self.template = 'next'
-            msgs = [msg,'Digite 1 para receber o próximo capítulo']
+            msgs = [msg,' \n \n Digite: \n 1 para receber o capítulo seguinte \n 2 para ver o índice. \n \n ']
             self.msg_to_send = msgs
             self.add_log(chap=last_cap+1)
             return msgs
