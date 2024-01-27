@@ -214,5 +214,6 @@ class Messages():
         if df.empty:
             return False
         else:
+            print('repeated wamid')
             return True
 
