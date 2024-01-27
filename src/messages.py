@@ -5,7 +5,7 @@ import pandas as pd
 
 class Messages():
 
-    def __init__(self,number,name,received_msg) -> None:
+    def __init__(self,number,name,received_msg,wamid='') -> None:
         self.perm_token = os.getenv('perm_token')
         self.db_name = os.getenv('db_name')
         self.db_user = os.getenv('db_user')
@@ -15,6 +15,7 @@ class Messages():
         self.received_msg = received_msg
         self.template = ''
         self.msg_to_send = ''
+        self.wamid = wamid
         return None    
 
     def check_block(self):
@@ -198,10 +199,20 @@ class Messages():
         if chap is None and template is None:
             raise Exception('One of chap or template is required')
         if chap is not None:
-            dbConnection.execute(text(f"INSERT INTO bot_mvp.msg_log (phone_number, chap,block) VALUES ({self.number},{chap},1);"))
+            dbConnection.execute(text(f"INSERT INTO bot_mvp.msg_log (phone_number, chap,block,wamid) VALUES ({self.number},{chap},1,'{self.wamid}');"))
             dbConnection.commit()
         elif template is not None:
-            dbConnection.execute(text(f"INSERT INTO bot_mvp.msg_log (phone_number, template,block) VALUES ({self.number},'{template}',1);"))
+            dbConnection.execute(text(f"INSERT INTO bot_mvp.msg_log (phone_number, template,block,wamid) VALUES ({self.number},'{template}',1,'{self.wamid}');"))
             dbConnection.commit()
         return None
+    
+    def check_repeat_msg(self):
+        sqlEngine       = create_engine(f'mysql+pymysql://{self.db_user}:@{self.db_name}/bot_mvp?password={self.db_pass}', pool_recycle=3600, future=True)
+        dbConnection    = sqlEngine.connect()
+        df = pd.read_sql(text(f"SELECT * FROM bot_mvp.msg_log ml \
+                        WHERE phone_number = {self.number} AND wamid = '{self.wamid}';"),dbConnection)
+        if df.empty:
+            return False
+        else:
+            return True
 

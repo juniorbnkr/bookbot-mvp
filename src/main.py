@@ -45,6 +45,7 @@ def webhook_whatsapp():
                             number = change["value"]["contacts"][0]["wa_id"]
                             name = change["value"]['contacts'][0]['profile']['name']
                             msg = change["value"]['messages'][0]['text']['body']
+                            wamid = change["value"]['messages'][0]['id']
 
         ## END MSG
 
@@ -56,9 +57,9 @@ def webhook_whatsapp():
                 msg = response['entry'][0]['changes'][0]['value']['messages'][0]['button']['text']
         ## END TEMPLATE
 
-        message = Messages(number,name,msg)
+        message = Messages(number,name,msg, wamid)
         
-        if not message.check_block():
+        if not message.check_block() and not message.check_repeat_msg():
             print('not blocked')
             message.send_msg()
             print('template',message.template)
