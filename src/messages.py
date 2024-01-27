@@ -123,7 +123,7 @@ class Messages():
                 self.received_msg = 'Próximo capítulo'
             else:
                 df = pd.read_sql(text(f"SELECT * FROM bot_mvp.memoriasBras ml \
-                            WHERE cap = 0 ORDER BY line asc;"),dbConnection)    
+                            WHERE cap = 0 AND content NOT LIKE '<%' ORDER BY line asc;"),dbConnection)    
                 msg = ''
                 for index, row in df.iterrows():
                     msg += row['content'] + '\n'
@@ -150,7 +150,7 @@ class Messages():
             else:
                 last_cap = -1
                 df = pd.read_sql(text(f"SELECT * FROM bot_mvp.memoriasBras ml \
-                            WHERE cap = 0 ORDER BY line asc;"),dbConnection)
+                            WHERE cap = 0 AND content NOT LIKE '<%'ORDER BY line asc;"),dbConnection)
             
             msg = ''
             for index, row in df.iterrows():
