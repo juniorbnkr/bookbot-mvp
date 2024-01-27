@@ -164,7 +164,13 @@ class Messages():
 
             # msg += "\n Envie 'Próximo Capítulo' para ver o capítulo seguinte"
             #self.template = 'next'
-            msgs = [msg,' \n \n Digite: \n 1 para receber o capítulo seguinte \n 2 para ver o índice. \n \n ']
+            if len(msg) > 4096:
+                msgs = []
+                for i in range(0,len(msg),4096):
+                    msgs.append(msg[i:i+4096])
+                msgs.append(' \n \n Digite: \n 1 para receber o capítulo seguinte \n 2 para ver o índice. \n \n ')
+            else:
+                msgs = [msg,' \n \n Digite: \n 1 para receber o capítulo seguinte \n 2 para ver o índice. \n \n ']
             self.msg_to_send = msgs
             self.add_log(chap=last_cap+1)
             return msgs
