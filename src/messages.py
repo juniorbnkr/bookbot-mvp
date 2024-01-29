@@ -197,7 +197,7 @@ class Messages():
                 return msgs
             else: 
                 msg = f'''Olá {self.name}, seja bem vindo de volta ao bookBot! \n 
-                    Você parou no capítulo {msgs.iloc[0]['chap']} \n Digite 1 para continuar'''
+\n Seu próximo capítulo é o {msgs.iloc[0]['chap']}. Digite 1 para continuar'''
                 self.msg_to_send = msg
                 # self.template = 'return'
                 self.add_log(template='return')
