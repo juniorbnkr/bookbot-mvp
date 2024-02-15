@@ -5,3 +5,4 @@ httpx
 sqlalchemy == 1.4.45
 pandas == 1.1.5
 pymysql
+cryptography
