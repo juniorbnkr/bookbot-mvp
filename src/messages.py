@@ -28,6 +28,7 @@ class Messages():
         print(msgs)
         print(len(msgs))
         if not msgs.empty:
+            print('bloqueado')
             return True
         return False
     
@@ -218,11 +219,13 @@ class Messages():
         return None
     
     def check_repeat_msg(self):
+        print('checkig repeat msg')
         sqlEngine       = create_engine(f'mysql+pymysql://{self.db_user}:@{self.db_name}/bot_mvp?password={self.db_pass}', pool_recycle=3600, future=True)
         dbConnection    = sqlEngine.connect()
         df = pd.read_sql(text(f"SELECT * FROM bot_mvp.msg_log ml \
                         WHERE phone_number = {self.number} AND wamid = '{self.wamid}';"),dbConnection)
         if df.empty:
+            print('new wamid, not repeated')
             return False
         else:
             print('repeated wamid')
