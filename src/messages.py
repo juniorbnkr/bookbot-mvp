@@ -2,6 +2,7 @@ import json,requests,os,time
 from sqlalchemy import create_engine  
 from sqlalchemy import text
 import pandas as pd
+import templates_messages
 
 class Messages():
 
@@ -16,7 +17,76 @@ class Messages():
         self.template = ''
         self.msg_to_send = ''
         self.wamid = wamid
-        return None    
+        self.sqlEngine = create_engine(f'mysql+pymysql://{self.db_user}:@{self.db_name}/bot_mvp?password={self.db_pass}', pool_recycle=3600, future=True).connect()
+        self.book_selected = self.get_book_selected()
+        self.author_chosed = self.get_author_selected()
+        self.book_available = ['Memórias Póstumas de Bras Cubas','Vidas Secas']
+        self.log_itens = {
+            "phone_number": self.number,
+            "chap": None,
+            "template": self.template,
+            "block": None,
+            "wamid": self.wamid,
+            "book": self.book_selected,
+            "author": self.author_chosed,
+        }
+        self.msgs = self.set_msgs()
+        return None 
+    
+    def get_book_selected(self):
+        dbConnection    = self.sqlEngine
+
+        df = pd.read_sql(text(f'''SELECT book FROM bot_mvp.msg_log 
+                                WHERE phone_number = {self.number}
+                                AND book IS NOT NULL
+                                ORDER BY created_at DESC
+                                LIMIT 1
+                                ;'''),dbConnection)
+        if not df.empty:
+            print('book: ',df['book'].values[0])
+            book_selected = df['book'].values[0]
+            return book_selected
+
+        print('no book selected')
+        return None
+    
+    def get_author_name(self,author_code=False):
+        if not author_code:
+            author_code = self.get_author_selected()
+        if author_code == '1':
+            return 'Machado de Assis'
+        if author_code == '2':
+            return 'Graciliano Ramos'
+
+        return None
+    
+    def get_author_selected(self):
+        dbConnection    = self.sqlEngine
+
+        df = pd.read_sql(text(f'''SELECT author FROM bot_mvp.msg_log 
+                                WHERE phone_number = {self.number}
+                                AND author IS NOT NULL
+                                ORDER BY created_at DESC
+                                LIMIT 1
+                                ;'''),dbConnection)
+        if not df.empty:
+            print('author: ',df['author'].values[0])
+            author_selected = df['author'].values[0]
+            return author_selected
+
+        print('no author selected')
+        return None
+    
+    def get_book_name(self,msg):
+        if msg == '1':
+            return 'Memórias Póstumas de Brás Cubas'
+        if msg == '2':
+            return 'Vidas Secas'
+
+        return None
+
+    def set_msgs(self):
+        return templates_messages.set_msgs(self)
 
     def check_block(self):
         sqlEngine       = create_engine(f'mysql+pymysql://{self.db_user}:@{self.db_name}/bot_mvp?password={self.db_pass}', pool_recycle=3600, future=True)
@@ -24,12 +94,10 @@ class Messages():
         msgs = pd.read_sql(text(f"SELECT * FROM bot_mvp.msg_log ml WHERE phone_number = {self.number} \
                                 AND block = 1 ORDER BY created_at DESC;"),dbConnection)
 
-        print(msgs.empty)
-        print(msgs)
-        print(len(msgs))
         if not msgs.empty:
-            print('bloqueado')
+            print('bloqueado XXXXXX')
             return True
+        print('not blocked')
         return False
     
     def unblock(self):
@@ -41,8 +109,7 @@ class Messages():
     
     def send_msg(self):
         self.msg_to_send = self.next_msg()
-        # print(self.msg_
-        # to_send)
+        print(self.msg_to_send)
         url = "https://graph.facebook.com/v17.0/116826464720753/messages/"
         
         if isinstance(self.msg_to_send,list):
@@ -113,109 +180,151 @@ class Messages():
                         WHERE phone_number = {self.number} AND template IS NULL ORDER BY created_at DESC LIMIT 1;"),dbConnection)
 
         return df
+    
+    def check_in_progress_book(self):
+        sqlEngine = self.sqlEngine
+        dbConnection = sqlEngine
+        df = pd.read_sql(text(f"""SELECT * FROM bot_mvp.msg_log ml \
+                        WHERE phone_number = {self.number} 
+                        AND book = {self.received_msg} ORDER BY created_at DESC
+                        ;"""),dbConnection)
+        return int(df['chap'].max())    
+
+    def get_last_chap(self,book):
+        sqlEngine       = self.sqlEngine
+        dbConnection    = sqlEngine
+        df = pd.read_sql(text(f"""SELECT chap as max_chap FROM bot_mvp.msg_log ml 
+                        WHERE phone_number = {self.number} AND book = '{book}'
+                        AND chap IS NOT NULL
+                        ORDER BY created_at DESC LIMIT 1;
+                        """),dbConnection)
+
+        last_cap = df['max_chap'].values[0] 
+        return last_cap
+
+    def get_chap_content(self, book, chap):
+        print(f'book: {book}, chap: {chap}')
+        if str(book) == '1':
+            table = 'memoriasBras'
+        elif str(book) == '2':
+            table = 'vidasSecas'
+        sqlEngine       = self.sqlEngine
+        dbConnection    = sqlEngine
+        df = pd.read_sql(text(f"SELECT content FROM bot_mvp.{table} ml \
+                        WHERE cap = {chap} and status = 'ACTIVE' \
+                        AND content NOT LIKE '<%' ORDER BY line asc;"),dbConnection)
+        content = ""
+        for index, row in df.iterrows():
+            content = content + row['content'] + '\n'
+        return content
 
     def next_msg(self):
-        sqlEngine       = create_engine(f'mysql+pymysql://{self.db_user}:@{self.db_name}/bot_mvp?password={self.db_pass}', pool_recycle=3600, future=True)
-        dbConnection    = sqlEngine.connect()
-        print(self.received_msg)
-        if self.received_msg.lower() == 'sim':
-            msgs = pd.read_sql(text(f"SELECT * FROM bot_mvp.msg_log ml \
-                        WHERE phone_number = {self.number} AND chap IS NOT NULL ORDER BY created_at DESC;"),dbConnection)
-            if not msgs.empty:
-                self.received_msg = 'Próximo capítulo'
-            else:
-                df = pd.read_sql(text(f"SELECT * FROM bot_mvp.memoriasBras ml \
-                            WHERE cap = 0 AND content NOT LIKE '<%' ORDER BY line asc;"),dbConnection)    
-                msg = ''
-                for index, row in df.iterrows():
-                    msg += row['content'] + '\n'
-                msgs = [msg,' \n \n Digite: \n 1 para receber o capítulo seguinte \n 2 para ver o índice. \n \n ']
-                self.msg_to_send = msgs
-                #self.template = 'next'
-                self.add_log(chap=0)
-                return msgs
-
-        if self.received_msg == '2':
-            msg = 'O índice está em desenvolvimento 🚧 \n Digite 1 para o próximo capítulo'
-            self.msg_to_send = msg
-            return msg
-        
-        if self.received_msg.lower().replace('í', 'i').replace('ó', 'o') == 'proximo capitulo' \
-            or self.received_msg == '1':
-            msgs = pd.read_sql(text(f"SELECT * FROM bot_mvp.msg_log ml \
-                        WHERE phone_number = {self.number} AND chap IS NOT NULL ORDER BY created_at DESC;"),dbConnection)
-            if not msgs.empty:
-                last_msg = msgs.iloc[0]
-            else:
-                last_msg = {'chap': None}
-
-            if last_msg['chap'] is not None:
-                last_cap = last_msg['chap']
-                print(last_cap)
-                df = pd.read_sql(text(f"SELECT * FROM bot_mvp.memoriasBras ml \
-                            WHERE cap = {last_cap + 1} ORDER BY line asc;"),dbConnection)    
-            else:
-                last_cap = -1
-                df = pd.read_sql(text(f"SELECT * FROM bot_mvp.memoriasBras ml \
-                            WHERE cap = 0 AND content NOT LIKE '<%'ORDER BY line asc;"),dbConnection)
-            
-            msg = ''
-            for index, row in df.iterrows():
-                msg += row['content'] + '\n'
-
-            # msg += "\n Envie 'Próximo Capítulo' para ver o capítulo seguinte"
-            #self.template = 'next'
-            if len(msg) > 4096:
-                msgs = []
-                for i in range(0,len(msg),4096):
-                    msgs.append(msg[i:i+4096])
-                msgs.append(' \n \n Digite: \n 1 para receber o capítulo seguinte \n 2 para ver o índice. \n \n ')
-            else:
-                msgs = [msg,' \n \n Digite: \n 1 para receber o capítulo seguinte \n 2 para ver o índice. \n \n ']
-            self.msg_to_send = msgs
-            self.add_log(chap=last_cap+1)
-            return msgs
-
+        sqlEngine       = self.sqlEngine
+        dbConnection    = sqlEngine
         msgs = pd.read_sql(text(f"SELECT * FROM bot_mvp.msg_log ml \
-                        WHERE phone_number = {self.number} ORDER BY created_at DESC;"),dbConnection)
-
+                        WHERE phone_number = {self.number};"),dbConnection)
         if msgs.empty:
-            msg = f"Olá {self.name}, seja bem vindo ao bookBot!"
-            msgs = [msg,'Digite 1 para iniciar a leitura do livro Memórias Póstumas de Brás Cubas']
-            self.msg_to_send = msgs
-            # self.template = 'initial'
-            self.add_log(template='initial')
-            return msgs
-        else:
-            msgs = pd.read_sql(text(f"SELECT * FROM bot_mvp.msg_log ml \
-                        WHERE phone_number = {self.number} AND chap IS NOT NULL ORDER BY created_at DESC;"),dbConnection)
-            if msgs.empty:
-                msg = f"Olá {self.name}, seja bem vindo ao bookBot!"
-                msgs = [msg,'Digite 1 para iniciar a leitura do livro Memórias Pósstumas de Brás Cubas']
-                self.msg_to_send = msgs
-                # self.template = 'initial'
-                self.add_log(template='initial')
-                return msgs
-            else: 
-                msg = f'''Olá {self.name}, seja bem vindo de volta ao bookBot! \n 
-\n Seu próximo capítulo é o {msgs.iloc[0]['chap']}. Digite 1 para continuar'''
-                self.msg_to_send = msg
-                # self.template = 'return'
-                self.add_log(template='return')
-                return msg
-
-    def add_log(self,chap=None,template=None):
+            self.log_itens['template'] = 'author_chosen'
+            self.add_log()
+            return [self.msgs['welcome'],self.msgs['author_chosen']]
         
-        sqlEngine       = create_engine(f'mysql+pymysql://{self.db_user}:@{self.db_name}/bot_mvp?password={self.db_pass}', pool_recycle=3600, future=True)
-        dbConnection    = sqlEngine.connect()
-        if chap is None and template is None:
+        if msgs['template'].iloc[-1] == 'author_chosen':
+            if self.received_msg in ['1','2'] :
+                self.log_itens['template'] = 'book_chosen'
+                self.log_itens['author'] = self.received_msg
+                self.add_log()
+                self.author_chosed = self.get_author_name(self.received_msg)
+                self.msgs = self.set_msgs()
+                return self.msgs['author_chosed']
+            return [self.msgs['wrong_author_chosed'], self.msgs['author_chosen']]
+        
+        if msgs['template'].iloc[-1] == 'book_chosen':
+            if self.received_msg in ['1'] :
+                self.book_chosed = self.received_msg
+                self.book_selected = self.get_book_name(self.received_msg)
+                self.msgs = self.set_msgs()
+                self.log_itens['template'] = 'book'
+                self.log_itens['book'] = self.book_chosed
+                self.log_itens['chap'] = 0
+                # self.add_log()
+                if not msgs[msgs['book']==int(self.received_msg)].empty:
+                    if self.check_in_progress_book() > 0:
+                        self.msgs = self.set_msgs()
+                        self.log_itens['template'] = 'continue_choose'
+                        self.log_itens['book'] = self.book_chosed
+                        self.log_itens['chap'] = None
+                        self.add_log()
+                        return [self.msgs['book_chosed'],self.msgs['start_or_continue']]
+                
+                return [self.msgs['book_chosed'],self.get_chap_content(self.received_msg,0),self.msgs['next']]
+            
+            if self.received_msg == '0':
+                self.log_itens['template'] = 'author_chosen'
+                self.add_log()
+                return self.msgs['author_chosen']
+            return [self.msgs['wrong_book_chosed'], self.msgs['author_chosed']]
+
+        if msgs['template'].iloc[-1] == 'continue_choose':
+            if self.received_msg == '1':
+                next_chap = self.get_last_chap(self.book_selected) + 1
+                self.log_itens['template'] = 'book'
+                self.log_itens['book'] = self.book_selected
+                self.log_itens['chap'] = next_chap
+                print(self.log_itens)
+                self.add_log()
+                return [self.get_chap_content(self.book_selected,
+                                              next_chap),
+                        self.msgs['next']]
+            
+            if self.received_msg == '2':
+                self.log_itens['template'] = 'book'
+                self.log_itens['chap'] = 0
+                self.log_itens['book'] = self.book_selected
+                print(self.log_itens)
+                self.add_log()
+                return [self.get_chap_content(self.book_selected,0),self.msgs['next']]
+            return [self.msgs['invalid'], self.msgs['author_chosed']]
+
+        if msgs['template'].iloc[-1] == 'book':
+            if self.book_selected not in [1,2]:
+                self.log_itens['template'] = 'author_chosen'
+                self.add_log()
+                return self.msgs['author_chosen']
+            
+            if self.received_msg not in ['1','2'] :
+                return [self.msgs['invalid'],self.msgs['next']]
+
+            if self.received_msg == '1':
+                content = self.get_chap_content(str(self.book_selected), int(msgs['chap'].iloc[-1]) + 1)
+                self.log_itens['chap'] = int(msgs['chap'].iloc[-1]) + 1
+                self.log_itens['template'] = 'book'
+                self.add_log()
+                return [content, self.msgs['next']]
+
+            if self.received_msg == '2':
+                self.log_itens['template'] = 'author_chosen'
+                self.add_log()
+                return [self.msgs['author_chosen']]
+
+        return 'flow'
+
+    def add_log(self,
+                chap=None,
+                template=None,
+                ):
+        
+        sqlEngine       = self.sqlEngine
+        dbConnection    = sqlEngine
+
+        if self.log_itens['chap'] is None and self.log_itens['template'] is None:
             raise Exception('One of chap or template is required')
-        if chap is not None:
-            dbConnection.execute(text(f"INSERT INTO bot_mvp.msg_log (phone_number, chap,block,wamid) VALUES ({self.number},{chap},1,'{self.wamid}');"))
-            dbConnection.commit()
-        elif template is not None:
-            dbConnection.execute(text(f"INSERT INTO bot_mvp.msg_log (phone_number, template,block,wamid) VALUES ({self.number},'{template}',1,'{self.wamid}');"))
-            dbConnection.commit()
+        chap = int(self.log_itens['chap']) if self.log_itens['chap'] is not None else 'NULL'
+        template = self.log_itens['template'] if self.log_itens['template'] is not None else 'NULL'
+        book = self.log_itens['book'] if self.log_itens['book'] is not None else 'NULL'
+        author = self.log_itens['author'] if self.log_itens['author'] is not None else 'NULL'
+        dbConnection.execute(text(f"""INSERT INTO bot_mvp.msg_log (phone_number,template, chap,block,wamid,author,book) 
+        VALUES ({self.number}, '{self.log_itens['template']}',{chap},1,'{self.wamid}','{author}', {book});"""))
+        dbConnection.commit()
         return None
     
     def check_repeat_msg(self):
