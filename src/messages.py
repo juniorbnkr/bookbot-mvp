@@ -17,6 +17,7 @@ class Messages():
         self.template = ''
         self.msg_to_send = ''
         self.wamid = wamid
+        self.last_chap = None
         self.sqlEngine = create_engine(f'mysql+pymysql://{self.db_user}:@{self.db_name}/bot_mvp?password={self.db_pass}', pool_recycle=3600, future=True)
         self.dbConnection = self.sqlEngine.connect()
         self.msgs_logs = pd.read_sql(text(f"SELECT * FROM bot_mvp.msg_log ml WHERE phone_number = {self.number} \
@@ -158,20 +159,14 @@ class Messages():
         # print(response.text)
         return response
     
-    def check_in_progress_book(self):
-        df = pd.read_sql(text(f"""SELECT * FROM bot_mvp.msg_log ml \
-                        WHERE phone_number = {self.number} 
-                        AND book = {self.received_msg} ORDER BY created_at DESC
-                        ;"""),self.dbConnection)
-        return int(df['chap'].max())    
-        df = self.msgs_logs[(self.msgs_logs['book'] == self.received_msg)]
-        return int(df['chap'].max())
-
+    def check_in_progress_book(self,book):   
+        df = self.msgs_logs[(self.msgs_logs['book'] == int(book)) & (self.msgs_logs['chap'].notnull())]
+        if not df.empty:
+            return int(df['chap'].iloc[0])
+        return 0
     def get_last_chap(self,book):
-        df = self.msgs_logs[(self.msgs_logs['book'] == book) & (self.msgs_logs['chap'].notnull())].tail(1)
-
-        last_cap = df['max_chap'].values[0] 
-        return last_cap
+        df = self.msgs_logs[(self.msgs_logs['book'] == int(book)) & (self.msgs_logs['chap'].notnull())]
+        return int(df['chap'].iloc[0]) if not df.empty else None
 
     def get_chap_content(self, book, chap):
         print(f'book: {book}, chap: {chap}')
@@ -194,7 +189,7 @@ class Messages():
             self.add_log()
             return [self.msgs['welcome'],self.msgs['author_chosen']]
         
-        if msgs['template'].iloc[1] == 'author_chosen':
+        if msgs['template'].iloc[0] == 'author_chosen':
             if self.received_msg in ['1','2'] :
                 self.log_itens['template'] = 'book_chosen'
                 self.log_itens['author'] = self.received_msg
@@ -207,16 +202,15 @@ class Messages():
             self.add_log()
             return [self.msgs['wrong_author_chosed'], self.msgs['author_chosen']]
         
-        if msgs['template'].iloc[1] == 'book_chosen':
+        if msgs['template'].iloc[0] == 'book_chosen':
             if self.received_msg in ['1'] :
                 self.book_chosed = self.received_msg
                 self.book_selected = self.get_book_name(self.received_msg)
                 self.msgs = self.set_msgs()
-                self.log_itens['template'] = 'book'
-                self.log_itens['book'] = self.book_chosed
-                self.log_itens['chap'] = 0
                 if not msgs[msgs['book']==int(self.received_msg)].empty:
-                    if self.check_in_progress_book() > 0:
+                    if self.check_in_progress_book(self.received_msg) > 0:
+                        self.last_chap = self.get_last_chap(self.received_msg)
+                        print('last chap: ',self.last_chap)
                         self.msgs = self.set_msgs()
                         self.log_itens['template'] = 'continue_choose'
                         self.log_itens['book'] = self.book_chosed
@@ -224,6 +218,9 @@ class Messages():
                         self.add_log()
                         return [self.msgs['book_chosed'],self.msgs['start_or_continue']]
                 
+                self.log_itens['template'] = 'book'
+                self.log_itens['book'] = self.book_chosed
+                self.log_itens['chap'] = 0
                 self.add_log()
                 return [self.msgs['book_chosed'],self.get_chap_content(self.received_msg,0),self.msgs['next']]
             
@@ -237,7 +234,7 @@ class Messages():
             self.add_log()
             return [self.msgs['wrong_book_chosed'], self.msgs['author_chosed']]
 
-        if msgs['template'].iloc[1] == 'continue_choose':
+        if msgs['template'].iloc[0] == 'continue_choose':
             if self.received_msg == '1':
                 next_chap = self.get_last_chap(self.book_selected) + 1
                 self.log_itens['template'] = 'book'
@@ -245,7 +242,7 @@ class Messages():
                 self.log_itens['chap'] = next_chap
                 print(self.log_itens)
                 self.add_log()
-                return [self.get_chap_content(self.book_selected,
+                return [self.get_chap_content(int(self.book_selected),
                                               next_chap),
                         self.msgs['next']]
             
@@ -253,15 +250,14 @@ class Messages():
                 self.log_itens['template'] = 'book'
                 self.log_itens['chap'] = 0
                 self.log_itens['book'] = self.book_selected
-                print(self.log_itens)
                 self.add_log()
-                return [self.get_chap_content(self.book_selected,0),self.msgs['next']]
+                return [self.get_chap_content(int(self.book_selected),0),self.msgs['next']]
             
             self.log_itens['template'] = 'continue_choose'
             self.add_log()
             return [self.msgs['invalid'], self.msgs['author_chosed']]
 
-        if msgs['template'].iloc[1] == 'book':
+        if msgs['template'].iloc[0] == 'book':
             if self.book_selected not in [1,2]:
                 self.log_itens['template'] = 'author_chosen'
                 self.add_log()
@@ -273,8 +269,9 @@ class Messages():
                 return [self.msgs['invalid'],self.msgs['next']]
 
             if self.received_msg == '1':
-                content = self.get_chap_content(str(self.book_selected), int(msgs['chap'].iloc[-1]) + 1)
-                self.log_itens['chap'] = int(msgs['chap'].iloc[-1]) + 1
+                next_chap = self.get_last_chap(self.book_selected) + 1
+                content = self.get_chap_content(int(self.book_selected), next_chap)
+                self.log_itens['chap'] = next_chap
                 self.log_itens['template'] = 'book'
                 self.add_log()
                 return [content, self.msgs['next']]
