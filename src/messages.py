@@ -19,7 +19,7 @@ class Messages():
         self.wamid = wamid
         self.sqlEngine = create_engine(f'mysql+pymysql://{self.db_user}:@{self.db_name}/bot_mvp?password={self.db_pass}', pool_recycle=3600, future=True)
         self.dbConnection = self.sqlEngine.connect()
-        self.msgs = pd.read_sql(text(f"SELECT * FROM bot_mvp.msg_log ml WHERE phone_number = {self.number} \
+        self.msgs_logs = pd.read_sql(text(f"SELECT * FROM bot_mvp.msg_log ml WHERE phone_number = {self.number} \
                                 ORDER BY created_at DESC;"),self.dbConnection)
         self.book_selected = self.get_book_selected()
         self.author_chosed = self.get_author_selected()
@@ -37,7 +37,7 @@ class Messages():
         return None 
     
     def get_book_selected(self):
-        df = self.msgs[(self.msgs['book'].notnull()) & (self.msgs['book']!='')].tail(1)
+        df = self.msgs_logs[(self.msgs_logs['book'].notnull()) & (self.msgs_logs['book']!='')].tail(1)
         if not df.empty:
             print('book: ',df['book'].values[0])
             book_selected = df['book'].values[0]
@@ -57,7 +57,7 @@ class Messages():
         return None
     
     def get_author_selected(self):
-        df = self.msgs[(self.msgs['author'].notnull()) & (self.msgs['author']!='')].tail(1)
+        df = self.msgs_logs[(self.msgs_logs['author'].notnull()) & (self.msgs_logs['author']!='')].tail(1)
         if not df.empty:
             print('author: ',df['author'].values[0])
             author_selected = df['author'].values[0]
@@ -164,11 +164,11 @@ class Messages():
                         AND book = {self.received_msg} ORDER BY created_at DESC
                         ;"""),self.dbConnection)
         return int(df['chap'].max())    
-        df = self.msgs[(self.msgs['book'] == self.received_msg)]
+        df = self.msgs_logs[(self.msgs_logs['book'] == self.received_msg)]
         return int(df['chap'].max())
 
     def get_last_chap(self,book):
-        df = self.msgs[(self.msgs['book'] == book) & (self.msgs['chap'].notnull())].tail(1)
+        df = self.msgs_logs[(self.msgs_logs['book'] == book) & (self.msgs_logs['chap'].notnull())].tail(1)
 
         last_cap = df['max_chap'].values[0] 
         return last_cap
@@ -188,7 +188,7 @@ class Messages():
         return content
 
     def next_msg(self):
-        msgs = self.msgs
+        msgs = self.msgs_logs
         if msgs.empty:
             self.log_itens['template'] = 'author_chosen'
             self.add_log()
