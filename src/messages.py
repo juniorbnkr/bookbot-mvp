@@ -95,6 +95,7 @@ class Messages():
     def send_msg(self):
         self.msg_to_send = self.next_msg()
         print(self.msg_to_send)
+        exit()
         url = "https://graph.facebook.com/v17.0/116826464720753/messages/"
         
         if isinstance(self.msg_to_send,list):
@@ -301,7 +302,7 @@ class Messages():
         author = self.log_itens['author'] if self.log_itens['author'] is not None else 'NULL'
         self.dbConnection.execute(text(f"""INSERT INTO bot_mvp.msg_log (phone_number,template, chap,block,wamid,author,book) 
         VALUES ({self.number}, '{template}',{chap},1,'{self.wamid}','{author}', {book});"""))
-        dbConnection.commit()
+        self.dbConnection.commit()
         return None
     
     def check_repeat_msg(self):
