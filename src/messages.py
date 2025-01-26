@@ -236,6 +236,9 @@ class Messages():
                 self.author_chosed = self.get_author_name(self.received_msg)
                 self.msgs = self.set_msgs()
                 return self.msgs['author_chosed']
+            self.log_itens['template'] = 'author_chosen'
+            self.log_itens['author'] = None
+            self.add_log()
             return [self.msgs['wrong_author_chosed'], self.msgs['author_chosen']]
         
         if msgs['template'].iloc[-1] == 'book_chosen':
@@ -246,7 +249,7 @@ class Messages():
                 self.log_itens['template'] = 'book'
                 self.log_itens['book'] = self.book_chosed
                 self.log_itens['chap'] = 0
-                # self.add_log()
+                self.add_log()
                 if not msgs[msgs['book']==int(self.received_msg)].empty:
                     if self.check_in_progress_book() > 0:
                         self.msgs = self.set_msgs()
@@ -262,6 +265,10 @@ class Messages():
                 self.log_itens['template'] = 'author_chosen'
                 self.add_log()
                 return self.msgs['author_chosen']
+            
+            self.log_itens['template'] = 'book_chosen'
+            self.log_itens['book'] = None
+            self.add_log()
             return [self.msgs['wrong_book_chosed'], self.msgs['author_chosed']]
 
         if msgs['template'].iloc[-1] == 'continue_choose':
@@ -283,6 +290,9 @@ class Messages():
                 print(self.log_itens)
                 self.add_log()
                 return [self.get_chap_content(self.book_selected,0),self.msgs['next']]
+            
+            self.log_itens['template'] = 'continue_choose'
+            self.add_log()
             return [self.msgs['invalid'], self.msgs['author_chosed']]
 
         if msgs['template'].iloc[-1] == 'book':
@@ -292,6 +302,8 @@ class Messages():
                 return self.msgs['author_chosen']
             
             if self.received_msg not in ['1','2'] :
+                self.log_itens['template'] = 'book'
+                self.add_log()
                 return [self.msgs['invalid'],self.msgs['next']]
 
             if self.received_msg == '1':
@@ -306,7 +318,7 @@ class Messages():
                 self.add_log()
                 return [self.msgs['author_chosen']]
 
-        return 'flow'
+        return None
 
     def add_log(self,
                 chap=None,
@@ -323,7 +335,7 @@ class Messages():
         book = self.log_itens['book'] if self.log_itens['book'] is not None else 'NULL'
         author = self.log_itens['author'] if self.log_itens['author'] is not None else 'NULL'
         dbConnection.execute(text(f"""INSERT INTO bot_mvp.msg_log (phone_number,template, chap,block,wamid,author,book) 
-        VALUES ({self.number}, '{self.log_itens['template']}',{chap},1,'{self.wamid}','{author}', {book});"""))
+        VALUES ({self.number}, '{template}',{chap},1,'{self.wamid}','{author}', {book});"""))
         dbConnection.commit()
         return None
     
