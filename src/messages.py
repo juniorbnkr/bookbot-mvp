@@ -291,8 +291,7 @@ class Messages():
                 template=None,
                 ):
         
-        sqlEngine       = self.sqlEngine
-        dbConnection    = sqlEngine
+        
 
         if self.log_itens['chap'] is None and self.log_itens['template'] is None:
             raise Exception('One of chap or template is required')
@@ -300,7 +299,7 @@ class Messages():
         template = self.log_itens['template'] if self.log_itens['template'] is not None else 'NULL'
         book = self.log_itens['book'] if self.log_itens['book'] is not None else 'NULL'
         author = self.log_itens['author'] if self.log_itens['author'] is not None else 'NULL'
-        dbConnection.execute(text(f"""INSERT INTO bot_mvp.msg_log (phone_number,template, chap,block,wamid,author,book) 
+        self.dbConnection.execute(text(f"""INSERT INTO bot_mvp.msg_log (phone_number,template, chap,block,wamid,author,book) 
         VALUES ({self.number}, '{template}',{chap},1,'{self.wamid}','{author}', {book});"""))
         dbConnection.commit()
         return None
