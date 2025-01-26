@@ -24,7 +24,7 @@ class Messages():
                                 ORDER BY created_at DESC;"),self.dbConnection)
         self.book_selected = self.get_book_selected()
         self.author_chosed = self.get_author_selected()
-        self.book_available = ['Memórias Póstumas de Bras Cubas','Vidas Secas']
+        self.book_available = ['Memórias Póstumas de Bras Cubas','Dom Casmurro']
         self.log_itens = {
             "phone_number": self.number,
             "chap": None,
@@ -71,7 +71,7 @@ class Messages():
         if msg == '1':
             return 'Memórias Póstumas de Brás Cubas'
         if msg == '2':
-            return 'Vidas Secas'
+            return 'Dom Casmurro'
 
         return None
 
@@ -173,7 +173,7 @@ class Messages():
         if str(book) == '1':
             table = 'memoriasBras'
         elif str(book) == '2':
-            table = 'vidasSecas'
+            table = 'domCasmurro'
         df = pd.read_sql(text(f"SELECT content FROM bot_mvp.{table} ml \
                         WHERE cap = {chap} and status = 'ACTIVE' \
                         AND content NOT LIKE '<%' ORDER BY line asc;"),self.dbConnection)
@@ -190,7 +190,7 @@ class Messages():
             return [self.msgs['welcome'],self.msgs['author_chosen']]
         
         if msgs['template'].iloc[0] == 'author_chosen':
-            if self.received_msg in ['1','2'] :
+            if self.received_msg in ['1'] :
                 self.log_itens['template'] = 'book_chosen'
                 self.log_itens['author'] = self.received_msg
                 self.add_log()
@@ -203,7 +203,7 @@ class Messages():
             return [self.msgs['wrong_author_chosed'], self.msgs['author_chosen']]
         
         if msgs['template'].iloc[0] == 'book_chosen':
-            if self.received_msg in ['1'] :
+            if self.received_msg in ['1','2']: :
                 self.book_chosed = self.received_msg
                 self.book_selected = self.get_book_name(self.received_msg)
                 self.msgs = self.set_msgs()
