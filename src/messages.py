@@ -203,7 +203,7 @@ class Messages():
             return [self.msgs['wrong_author_chosed'], self.msgs['author_chosen']]
         
         if msgs['template'].iloc[0] == 'book_chosen':
-            if self.received_msg in ['1','2']: :
+            if self.received_msg in ['1','2']:
                 self.book_chosed = self.received_msg
                 self.book_selected = self.get_book_name(self.received_msg)
                 self.msgs = self.set_msgs()
