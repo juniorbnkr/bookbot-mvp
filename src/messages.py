@@ -194,7 +194,7 @@ class Messages():
             self.add_log()
             return [self.msgs['welcome'],self.msgs['author_chosen']]
         
-        if msgs['template'].iloc[-1] == 'author_chosen':
+        if msgs['template'].iloc[1] == 'author_chosen':
             if self.received_msg in ['1','2'] :
                 self.log_itens['template'] = 'book_chosen'
                 self.log_itens['author'] = self.received_msg
@@ -207,7 +207,7 @@ class Messages():
             self.add_log()
             return [self.msgs['wrong_author_chosed'], self.msgs['author_chosen']]
         
-        if msgs['template'].iloc[-1] == 'book_chosen':
+        if msgs['template'].iloc[1] == 'book_chosen':
             if self.received_msg in ['1'] :
                 self.book_chosed = self.received_msg
                 self.book_selected = self.get_book_name(self.received_msg)
@@ -215,7 +215,6 @@ class Messages():
                 self.log_itens['template'] = 'book'
                 self.log_itens['book'] = self.book_chosed
                 self.log_itens['chap'] = 0
-                self.add_log()
                 if not msgs[msgs['book']==int(self.received_msg)].empty:
                     if self.check_in_progress_book() > 0:
                         self.msgs = self.set_msgs()
@@ -225,6 +224,7 @@ class Messages():
                         self.add_log()
                         return [self.msgs['book_chosed'],self.msgs['start_or_continue']]
                 
+                self.add_log()
                 return [self.msgs['book_chosed'],self.get_chap_content(self.received_msg,0),self.msgs['next']]
             
             if self.received_msg == '0':
@@ -237,7 +237,7 @@ class Messages():
             self.add_log()
             return [self.msgs['wrong_book_chosed'], self.msgs['author_chosed']]
 
-        if msgs['template'].iloc[-1] == 'continue_choose':
+        if msgs['template'].iloc[1] == 'continue_choose':
             if self.received_msg == '1':
                 next_chap = self.get_last_chap(self.book_selected) + 1
                 self.log_itens['template'] = 'book'
@@ -261,7 +261,7 @@ class Messages():
             self.add_log()
             return [self.msgs['invalid'], self.msgs['author_chosed']]
 
-        if msgs['template'].iloc[-1] == 'book':
+        if msgs['template'].iloc[1] == 'book':
             if self.book_selected not in [1,2]:
                 self.log_itens['template'] = 'author_chosen'
                 self.add_log()

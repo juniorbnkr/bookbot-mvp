@@ -33,6 +33,7 @@ def webhook_whatsapp():
         if event.type == 'delivered':
             time.sleep(5)
         message.unblock()
+        message.dbConnection.close()
 
     if event.type == 'receive':
         ## START MSG
