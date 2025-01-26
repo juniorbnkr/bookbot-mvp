@@ -95,7 +95,6 @@ class Messages():
     def send_msg(self):
         self.msg_to_send = self.next_msg()
         print(self.msg_to_send)
-        exit()
         url = "https://graph.facebook.com/v17.0/116826464720753/messages/"
         
         if isinstance(self.msg_to_send,list):
