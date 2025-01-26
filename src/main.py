@@ -66,7 +66,9 @@ def webhook_whatsapp():
             print('msg = ',message.msg_to_send)
             if message.template != '':
                 message.send_template()
-    messages.sqlEngine.dispose()
+        
+        message.dbConnection.close()
+
     return jsonify({"status": "success"}, 200)
 
 if __name__ == '__main__': 

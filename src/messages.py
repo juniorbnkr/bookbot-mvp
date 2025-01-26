@@ -17,7 +17,10 @@ class Messages():
         self.template = ''
         self.msg_to_send = ''
         self.wamid = wamid
-        self.sqlEngine = create_engine(f'mysql+pymysql://{self.db_user}:@{self.db_name}/bot_mvp?password={self.db_pass}', pool_recycle=3600, future=True).connect()
+        self.sqlEngine = create_engine(f'mysql+pymysql://{self.db_user}:@{self.db_name}/bot_mvp?password={self.db_pass}', pool_recycle=3600, future=True)
+        self.dbConnection = self.sqlEngine.connect()
+        self.msgs = pd.read_sql(text(f"SELECT * FROM bot_mvp.msg_log ml WHERE phone_number = {self.number} \
+                                ORDER BY created_at DESC;"),self.dbConnection)
         self.book_selected = self.get_book_selected()
         self.author_chosed = self.get_author_selected()
         self.book_available = ['Memórias Póstumas de Bras Cubas','Vidas Secas']
@@ -34,14 +37,7 @@ class Messages():
         return None 
     
     def get_book_selected(self):
-        dbConnection    = self.sqlEngine
-
-        df = pd.read_sql(text(f'''SELECT book FROM bot_mvp.msg_log 
-                                WHERE phone_number = {self.number}
-                                AND book IS NOT NULL
-                                ORDER BY created_at DESC
-                                LIMIT 1
-                                ;'''),dbConnection)
+        df = self.msgs[(self.msgs['book'].notnull()) & (self.msgs['book']!='')].tail(1)
         if not df.empty:
             print('book: ',df['book'].values[0])
             book_selected = df['book'].values[0]
@@ -61,14 +57,7 @@ class Messages():
         return None
     
     def get_author_selected(self):
-        dbConnection    = self.sqlEngine
-
-        df = pd.read_sql(text(f'''SELECT author FROM bot_mvp.msg_log 
-                                WHERE phone_number = {self.number}
-                                AND author IS NOT NULL
-                                ORDER BY created_at DESC
-                                LIMIT 1
-                                ;'''),dbConnection)
+        df = self.msgs[(self.msgs['author'].notnull()) & (self.msgs['author']!='')].tail(1)
         if not df.empty:
             print('author: ',df['author'].values[0])
             author_selected = df['author'].values[0]
@@ -89,10 +78,8 @@ class Messages():
         return templates_messages.set_msgs(self)
 
     def check_block(self):
-        sqlEngine       = create_engine(f'mysql+pymysql://{self.db_user}:@{self.db_name}/bot_mvp?password={self.db_pass}', pool_recycle=3600, future=True)
-        dbConnection    = sqlEngine.connect()
         msgs = pd.read_sql(text(f"SELECT * FROM bot_mvp.msg_log ml WHERE phone_number = {self.number} \
-                                AND block = 1 ORDER BY created_at DESC;"),dbConnection)
+                                AND block = 1 ORDER BY created_at DESC;"),self.dbConnection)
 
         if not msgs.empty:
             print('bloqueado XXXXXX')
@@ -101,10 +88,8 @@ class Messages():
         return False
     
     def unblock(self):
-        sqlEngine       = create_engine(f'mysql+pymysql://{self.db_user}:@{self.db_name}/bot_mvp?password={self.db_pass}', pool_recycle=3600, future=True)
-        dbConnection    = sqlEngine.connect()
-        dbConnection.execute(text(f'UPDATE bot_mvp.msg_log SET block = 0 WHERE phone_number = {self.number};'))
-        dbConnection.commit()
+        self.dbConnection.execute(text(f'UPDATE bot_mvp.msg_log SET block = 0 WHERE phone_number = {self.number};'))
+        self.dbConnection.commit()
         return None
     
     def send_msg(self):
@@ -172,32 +157,18 @@ class Messages():
         # response = httpx.post(url, data=payload, headers=headers)
         # print(response.text)
         return response
-
-    def get_last_msg(self):
-        sqlEngine       = create_engine(f'mysql+pymysql://{self.db_user}:@{self.db_name}/bot_mvp?password={self.db_pass}', pool_recycle=3600, future=True)
-        dbConnection    = sqlEngine.connect()
-        df = pd.read_sql(text(f"SELECT * FROM bot_mvp.msg_log ml \
-                        WHERE phone_number = {self.number} AND template IS NULL ORDER BY created_at DESC LIMIT 1;"),dbConnection)
-
-        return df
     
     def check_in_progress_book(self):
-        sqlEngine = self.sqlEngine
-        dbConnection = sqlEngine
         df = pd.read_sql(text(f"""SELECT * FROM bot_mvp.msg_log ml \
                         WHERE phone_number = {self.number} 
                         AND book = {self.received_msg} ORDER BY created_at DESC
-                        ;"""),dbConnection)
+                        ;"""),self.dbConnection)
         return int(df['chap'].max())    
+        df = self.msgs[(self.msgs['book'] == self.received_msg)]
+        return int(df['chap'].max())
 
     def get_last_chap(self,book):
-        sqlEngine       = self.sqlEngine
-        dbConnection    = sqlEngine
-        df = pd.read_sql(text(f"""SELECT chap as max_chap FROM bot_mvp.msg_log ml 
-                        WHERE phone_number = {self.number} AND book = '{book}'
-                        AND chap IS NOT NULL
-                        ORDER BY created_at DESC LIMIT 1;
-                        """),dbConnection)
+        df = self.msgs[(self.msgs['book'] == book) & (self.msgs['chap'].notnull())].tail(1)
 
         last_cap = df['max_chap'].values[0] 
         return last_cap
@@ -208,21 +179,16 @@ class Messages():
             table = 'memoriasBras'
         elif str(book) == '2':
             table = 'vidasSecas'
-        sqlEngine       = self.sqlEngine
-        dbConnection    = sqlEngine
         df = pd.read_sql(text(f"SELECT content FROM bot_mvp.{table} ml \
                         WHERE cap = {chap} and status = 'ACTIVE' \
-                        AND content NOT LIKE '<%' ORDER BY line asc;"),dbConnection)
+                        AND content NOT LIKE '<%' ORDER BY line asc;"),self.dbConnection)
         content = ""
         for index, row in df.iterrows():
             content = content + row['content'] + '\n'
         return content
 
     def next_msg(self):
-        sqlEngine       = self.sqlEngine
-        dbConnection    = sqlEngine
-        msgs = pd.read_sql(text(f"SELECT * FROM bot_mvp.msg_log ml \
-                        WHERE phone_number = {self.number};"),dbConnection)
+        msgs = self.msgs
         if msgs.empty:
             self.log_itens['template'] = 'author_chosen'
             self.add_log()
