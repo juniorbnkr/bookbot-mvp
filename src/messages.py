@@ -24,7 +24,7 @@ class Messages():
                                 ORDER BY created_at DESC;"),self.dbConnection)
         self.book_selected = self.get_book_selected()
         self.author_chosed = self.get_author_selected()
-        self.book_available = ['Memórias Póstumas de Bras Cubas','Dom Casmurro']
+        self.book_available = 'Memórias Póstumas de Bras Cubas' if self.author_chosed == 1 else 'Vidas Secas'
         self.log_itens = {
             "phone_number": self.number,
             "chap": None,
@@ -58,7 +58,7 @@ class Messages():
         return None
     
     def get_author_selected(self):
-        df = self.msgs_logs[(self.msgs_logs['author'].notnull()) & (self.msgs_logs['author']!='')].tail(1)
+        df = self.msgs_logs[(self.msgs_logs['author'].notnull()) & (self.msgs_logs['author']!='')].head(1)
         if not df.empty:
             print('author: ',df['author'].values[0])
             author_selected = df['author'].values[0]
@@ -68,10 +68,10 @@ class Messages():
         return None
     
     def get_book_name(self,msg):
-        if msg == '1':
+        if self.author_chosed == '1':
             return 'Memórias Póstumas de Brás Cubas'
-        if msg == '2':
-            return 'Dom Casmurro'
+        if self.author_chosed == '2':
+            return 'Vidas Secas'
 
         return None
 
@@ -160,26 +160,36 @@ class Messages():
         return response
     
     def check_in_progress_book(self,book):   
-        df = self.msgs_logs[(self.msgs_logs['book'] == int(book)) & (self.msgs_logs['chap'].notnull())]
+        df = self.msgs_logs[(self.msgs_logs['book'] == int(book)) & (self.msgs_logs['chap'].notnull()) & (self.msgs_logs['author'] == self.author_chosed)]
         if not df.empty:
             return int(df['chap'].iloc[0])
         return 0
     def get_last_chap(self,book):
-        df = self.msgs_logs[(self.msgs_logs['book'] == int(book)) & (self.msgs_logs['chap'].notnull())]
+        df = self.msgs_logs[(self.msgs_logs['book'] == int(book)) & (self.msgs_logs['chap'].notnull()) & (self.msgs_logs['author'] == self.author_chosed)]
         return int(df['chap'].iloc[0]) if not df.empty else None
 
     def get_chap_content(self, book, chap):
         print(f'book: {book}, chap: {chap}')
-        if str(book) == '1':
+        if self.author_chosed == '1':
             table = 'memoriasBras'
-        elif str(book) == '2':
-            table = 'domCasmurro'
+        elif self.author_chosed == '2':
+            table = 'vidasSecas'
         df = pd.read_sql(text(f"SELECT content FROM bot_mvp.{table} ml \
                         WHERE cap = {chap} and status = 'ACTIVE' \
-                        AND content NOT LIKE '<%' ORDER BY line asc;"),self.dbConnection)
+                        AND content NOT LIKE '<%' ORDER BY CAST(line AS SIGNED) ASC;"),self.dbConnection)
         content = ""
         for index, row in df.iterrows():
-            content = content + row['content'] + '\n'
+            if row['content'].startswith('—'):
+                content = content + '\n'+ '\n'
+
+            if row['content'] != '':
+                content = content + row['content']  + ' '
+            else:
+                content = content + '\n'
+
+            if row['content'].startswith('—'):
+                content = content + '\n'+ '\n'
+
         return content
 
     def next_msg(self):
@@ -190,7 +200,7 @@ class Messages():
             return [self.msgs['welcome'],self.msgs['author_chosen']]
         
         if msgs['template'].iloc[0] == 'author_chosen':
-            if self.received_msg in ['1'] :
+            if self.received_msg in ['1', '2']:
                 self.log_itens['template'] = 'book_chosen'
                 self.log_itens['author'] = self.received_msg
                 self.add_log()
@@ -203,13 +213,13 @@ class Messages():
             return [self.msgs['wrong_author_chosed'], self.msgs['author_chosen']]
         
         if msgs['template'].iloc[0] == 'book_chosen':
-            if self.received_msg in ['1','2']:
+            if self.received_msg in ['1']:
                 self.book_chosed = self.received_msg
                 self.book_selected = self.get_book_name(self.received_msg)
                 self.msgs = self.set_msgs()
-                if not msgs[msgs['book']==int(self.received_msg)].empty:
-                    if self.check_in_progress_book(self.received_msg) > 0:
-                        self.last_chap = self.get_last_chap(self.received_msg)
+                if not msgs[msgs['book']==int(self.book_chosed)].empty:
+                    if self.check_in_progress_book(self.book_chosed) > 0:
+                        self.last_chap = self.get_last_chap(self.book_chosed)
                         print('last chap: ',self.last_chap)
                         self.msgs = self.set_msgs()
                         self.log_itens['template'] = 'continue_choose'
@@ -222,7 +232,7 @@ class Messages():
                 self.log_itens['book'] = self.book_chosed
                 self.log_itens['chap'] = 0
                 self.add_log()
-                return [self.msgs['book_chosed'],self.get_chap_content(self.received_msg,0),self.msgs['next']]
+                return [self.msgs['book_chosed'],self.get_chap_content(self.book_chosed,0),self.msgs['next']]
             
             if self.received_msg == '0':
                 self.log_itens['template'] = 'author_chosen'
@@ -289,7 +299,6 @@ class Messages():
                 ):
         
         
-
         if self.log_itens['chap'] is None and self.log_itens['template'] is None:
             raise Exception('One of chap or template is required')
         chap = int(self.log_itens['chap']) if self.log_itens['chap'] is not None else 'NULL'
