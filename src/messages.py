@@ -16,6 +16,7 @@ class Messages():
         self.received_msg = received_msg
         self.template = ''
         self.msg_to_send = ''
+        self.author_chosed_name = ''
         self.wamid = wamid
         self.last_chap = None
         self.sqlEngine = create_engine(f'mysql+pymysql://{self.db_user}:@{self.db_name}/bot_mvp?password={self.db_pass}', pool_recycle=3600, future=True)
@@ -96,6 +97,7 @@ class Messages():
     def send_msg(self):
         self.msg_to_send = self.next_msg()
         print(self.msg_to_send)
+        exit()
         url = "https://graph.facebook.com/v17.0/116826464720753/messages/"
         
         if isinstance(self.msg_to_send,list):
@@ -204,8 +206,8 @@ class Messages():
                 self.log_itens['template'] = 'book_chosen'
                 self.log_itens['author'] = self.received_msg
                 self.add_log()
-                self.author_chosed = self.get_author_name(self.received_msg)
-                self.book_available = 'Memórias Póstumas de Bras Cubas' if self.author_chosed == 1 else 'Vidas Secas'
+                self.author_chosed_name = self.get_author_name(self.received_msg)
+                self.book_available = 'Memórias Póstumas de Bras Cubas' if self.received_msg == '1' else 'Vidas Secas'
                 self.msgs = self.set_msgs()
                 return self.msgs['author_chosed']
             self.log_itens['template'] = 'author_chosen'

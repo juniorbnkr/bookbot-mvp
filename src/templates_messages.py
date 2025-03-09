@@ -7,7 +7,7 @@ Digite 1 para *Machado de Assis*.
 Digite 2 para *Graciliano Ramos*.
         ''',
         'book_chosed': f'''Muito bem! Você selecionou o livro {obj.book_selected} \n''',
-        'author_chosed': f'''O autor escolhido foi: {obj.author_chosed}.
+        'author_chosed': f'''O autor escolhido foi: {obj.author_chosed_name}.
 Escolha o livro que deseja ler:
 Digite 1 para *{obj.book_available}*.
 Ou digite 0 para voltar ao menu inicial.''',
