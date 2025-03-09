@@ -96,7 +96,11 @@ class Messages():
     
     def send_msg(self):
         self.msg_to_send = self.next_msg()
-        print(self.msg_to_send)
+        for msg in self.msg_to_send:
+            print(len(msg))
+            print('-----------')
+            print(msg[0:200])
+        # print(self.msg_to_send)
         url = "https://graph.facebook.com/v17.0/116826464720753/messages/"
         
         if isinstance(self.msg_to_send,list):
@@ -107,7 +111,6 @@ class Messages():
                 "to": self.number,
                 "type": "text",
                 "text": {
-                    "preview_url": False,
                     "body": msg
                 }
                 })
@@ -123,7 +126,6 @@ class Messages():
             "to": self.number,
             "type": "text",
             "text": {
-                "preview_url": False,
                 "body": self.msg_to_send
             }
             })
