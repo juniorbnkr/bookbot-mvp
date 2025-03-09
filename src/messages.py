@@ -93,19 +93,34 @@ class Messages():
         self.dbConnection.execute(text(f'UPDATE bot_mvp.msg_log SET block = 0 WHERE phone_number = {self.number};'))
         self.dbConnection.commit()
         return None
-    
+
+    def break_msgs_by_limit (msgs):
+        result = []
+        for string in msgs:
+            while len(string) > 4096:
+                limit = 4096
+                ponto = string.rfind('.', 0, limit)
+                
+                if ponto != -1:
+                    result.append(string[:ponto+1])  # Inclui o ponto na divisão
+                    string = string[ponto+1:]  # Remove a parte dividida
+                else:
+                    # Se não encontrar ponto, divide em 4096 caracteres
+                    result.append(string[:limit])
+                    string = string[limit:]
+            
+            result.append(string)  # Adiciona a última parte da string
+        return result
+
     def send_msg(self):
         self.msg_to_send = self.next_msg()
-        for msg in self.msg_to_send:
-            print(len(msg))
-            print('-----------')
-            print(msg[0:200])
         # print(self.msg_to_send)
         url = "https://graph.facebook.com/v17.0/116826464720753/messages/"
         
         if isinstance(self.msg_to_send,list):
+            msgs = self.break_msgs_by_limit(self.msg_to_send)
             response = []
-            for msg in self.msg_to_send:
+            for msg in msgs:
                 payload = json.dumps({
                 "messaging_product": "whatsapp",
                 "to": self.number,
