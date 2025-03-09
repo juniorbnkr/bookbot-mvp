@@ -94,7 +94,7 @@ class Messages():
         self.dbConnection.commit()
         return None
 
-    def break_msgs_by_limit (msgs):
+    def break_msgs_by_limit (self,msgs):
         result = []
         for string in msgs:
             while len(string) > 4096:
