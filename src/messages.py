@@ -185,7 +185,7 @@ class Messages():
             if row['content'] != '':
                 content = content + row['content']  + ' '
             else:
-                content = content + '\n'
+                content = content + '\n\n'
 
             if row['content'].startswith('—'):
                 content = content + '\n'+ '\n'
