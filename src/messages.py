@@ -205,6 +205,7 @@ class Messages():
                 self.log_itens['author'] = self.received_msg
                 self.add_log()
                 self.author_chosed = self.get_author_name(self.received_msg)
+                self.book_available = 'Memórias Póstumas de Bras Cubas' if self.author_chosed == 1 else 'Vidas Secas'
                 self.msgs = self.set_msgs()
                 return self.msgs['author_chosed']
             self.log_itens['template'] = 'author_chosen'
